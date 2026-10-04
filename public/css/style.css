@@ -7254,3 +7254,10 @@ body[data-uistyle="modern"] .btn {
     font-size: 14px;
   }
 }
+
+/* --- 2D MMO battle background --- */
+.battle-arena-2d {
+  background-image: url('../img/battle-arena-bg.webp');
+  background-size: cover;
+  background-position: center;
+}
