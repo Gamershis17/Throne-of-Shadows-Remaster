@@ -7045,12 +7045,12 @@ body.theme-gothic-manor .panel, body.theme-gothic-manor .card {
   100% { box-shadow: 0 0 5px rgba(241, 196, 15, 0.4); border-color: #333; }
 }
 .raid-ready-pulse {
-  animation: goldPulse 2s infinite ease-in-out;
+  /* REMASTER: pulse animation removed for FPS */
   background: linear-gradient(135deg, #111 0%, #1a0f0f 100%) !important;
 }
 .directive-panel .progress-fill.raid-ready {
   background: linear-gradient(90deg, #a335ee, #ffd700) !important;
-  animation: goldPulse 2s infinite ease-in-out;
+  /* REMASTER: pulse animation removed for FPS */
 }
 .raid-launch-btn {
   background: linear-gradient(180deg, #e74c3c, #c0392b);

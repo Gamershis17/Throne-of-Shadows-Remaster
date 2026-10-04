@@ -3608,9 +3608,13 @@ export const UI = {
     ctx.globalAlpha = 1;
   },
   _startBgLoop() {
+    // REMASTER: background animation loop DISABLED for FPS.
+    // Backgrounds render as a single static frame only.
     this._stopBgLoop();
     const B = this._bg;
     if (!B || !B.scene) return;
+    this._drawBgFrame(1200, true);
+    return;
     B.last = performance.now();
     // Ambient background frame rate comes from Settings (30/60 FPS): drifting
     // particles look identical at half the frame rate, and 30 halves the fill
