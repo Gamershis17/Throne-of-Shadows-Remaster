@@ -1,482 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#12101a">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.v2.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.v2.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.v2.png">
-  <link rel="icon" href="/icons/favicon.v2.ico" sizes="16x16 32x32 48x48">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
-  <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004m">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Throne of Shadows Remaster</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<canvas id="bg-canvas" aria-hidden="true"></canvas>
-<div id="ornate-texture" aria-hidden="true"></div>
-<div id="app">
 
-  <!-- ============ AUTH ============ -->
-  <section id="view-auth" class="view remaster-auth">
-    <div class="remaster-bg" aria-hidden="true"></div>
-    <div class="remaster-stars" aria-hidden="true"></div>
-    <div class="remaster-embers" aria-hidden="true"></div>
-    <div class="remaster-vignette" aria-hidden="true"></div>
-    <div class="remaster-fireglow" aria-hidden="true"></div>
-    <div class="auth-wrap remaster-wrap mockup-style">
-      <div class="mockup-title-block">
-        <img class="mockup-logo" src="img/remaster-logo.webp" alt="Throne of Shadows logo">
-        <h1 class="mockup-title">THRONE OF<br>SHADOWS</h1>
-        <div class="mockup-subtitle">REMASTER</div>
-      </div>
-      <div id="path-select">
-        <div class="mockup-choose">CHOOSE YOUR PATH</div>
-        <button id="path-guest-btn" class="mockup-path-btn guest-path" type="button">
-          <span class="path-title">PLAY AS GUEST</span>
-          <span class="path-sub">Begin instantly · Level 20 cap</span>
-          <span class="path-arrow">›</span>
-        </button>
-        <button id="path-account-btn" class="mockup-path-btn account-path" type="button">
-          <span class="path-title">LOGIN / CREATE ACCOUNT</span>
-          <span class="path-sub">Save your legend · Level 60 cap</span>
-          <span class="path-arrow">›</span>
-        </button>
-      </div>
-      <div id="auth-forms" class="hidden">
-        <button id="auth-back-btn" class="btn ghost small" type="button">← Back</button>
-        <div class="auth-card mockup-card">
-          <div class="auth-tabs">
-            <button id="auth-tab-login" class="auth-tab active" type="button">Login</button>
-            <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
-          </div>
-          <form id="login-form" class="auth-form" autocomplete="on">
-            <input id="login-username" placeholder="Username" autocomplete="username" maxlength="20">
-            <input id="login-password" type="password" placeholder="Password" autocomplete="current-password">
-            <button type="submit" class="btn gold">Login</button>
-          </form>
-          <form id="register-form" class="auth-form hidden" autocomplete="on">
-            <input id="reg-username" placeholder="Username (3–20, letters/numbers/_)" autocomplete="username" maxlength="20">
-            <input id="reg-password" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
-            <input id="reg-password2" type="password" placeholder="Confirm password" autocomplete="new-password">
-            <button type="submit" class="btn gold">Create hero</button>
-            <p class="muted small" style="text-align:center;margin-top:8px;"><span class="cap-note">👑 Account level cap: 60</span></p>
-          </form>
-          <div id="auth-error" class="auth-error hidden"></div>
-          <div class="guest-block">
-            <div class="guest-divider"><span>or</span></div>
-            <div id="guest-continue" class="hidden">
-              <p class="muted small">Guest adventure found: <b id="guest-continue-name" class="gold-text"></b></p>
-              <button id="guest-continue-btn" class="btn wide" type="button">Continue as guest</button>
-              <button id="guest-fresh-btn" class="btn ghost small" type="button">start over instead</button>
-            </div>
-            <div id="guest-start">
-              <input id="guest-name" placeholder="Guest name (optional)" maxlength="16" autocomplete="off">
-              <button id="guest-play-btn" class="btn wide" type="button">Play as Guest</button>
-              <p class="muted small">No account needed. Progress saves on this device only.<br><span class="cap-note">⚔️ Guest level cap: 20</span></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button id="discord-login" class="btn discord-big" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span>Join the Discord</span></button>
-    </div>
-  </section>
+<!-- CLASS SELECT -->
+<section id="view-class" class="view">
+  <div class="class-wrap">
+    <h1 class="game-title">THRONE OF SHADOWS</h1>
+    <div class="game-subtitle">REMASTER</div>
+    <p class="choose-label">CHOOSE YOUR CLASS</p>
+    <div id="class-cards" class="class-cards"></div>
+    <input id="hero-name" placeholder="Hero name" maxlength="16" autocomplete="off">
+    <button id="start-btn" class="btn gold big">BEGIN ADVENTURE</button>
+  </div>
+</section>
 
-  <!-- ============ MAINTENANCE ============ -->
-  <section id="view-maintenance" class="view hidden">
-    <div class="auth-wrap">
-      <div class="logo">🛠️</div>
-      <h1>Down for maintenance</h1>
-      <p class="tagline" id="maintenance-message">We're polishing the realm. Back shortly.</p>
-      <p class="muted small">Checking again automatically…</p>
-      <button id="maintenance-off-btn" class="hidden" style="margin-top:16px;padding:12px 22px;border:none;border-radius:8px;font-size:15px;font-family:inherit;font-weight:bold;cursor:pointer;background:linear-gradient(180deg,#3fae5a,#2b7a3e);color:#eafff0">Turn maintenance OFF</button>
-      <p class="muted small" style="margin-top:18px;opacity:.55"><a href="/maintenance.html" style="color:inherit">staff</a></p>
-    </div>
-  </section>
-
-  <!-- ============ RACE SELECT (first run) ============ -->
-  <section id="view-race" class="view hidden">
-    <div class="race-wrap">
-      <h1>Choose your race</h1>
-      <p class="muted">This shapes your hero's destiny — choose wisely.</p>
-      <div id="race-grid" class="race-grid"></div>
-    </div>
-  </section>
-
-  <section id="view-class" class="view hidden">
-    <div class="race-wrap">
-      <h1>Choose your class</h1>
-      <p class="muted">A <b>permanent</b> choice — pick the hero you want to be.</p>
-      <div id="class-grid" class="race-grid"></div>
-    </div>
-  </section>
-
-  <section id="view-spec" class="view hidden">
-    <div class="race-wrap">
-      <h1>Choose your specialization</h1>
-      <p class="muted">Pairs with any class. A <b>permanent</b> choice.</p>
-      <div id="spec-grid" class="race-grid"></div>
-    </div>
-  </section>
-
-  <section id="view-pet" class="view hidden">
-    <div class="race-wrap">
-      <h1>Choose your companion</h1>
-      <p class="muted">A hunter is never alone — pick the beast that fights beside you. A <b>permanent</b> choice.</p>
-      <div id="pet-grid" class="race-grid"></div>
-    </div>
-  </section>
-
-  <!-- ============ MAIN APP ============ -->
-  <section id="view-app" class="view hidden">
-    <div id="maintenance-banner" class="maint-banner hidden"></div>
-    <div id="update-banner" class="update-banner hidden"></div>
-    <div id="update-refresh" class="update-refresh hidden">
-      <div class="update-refresh-card">
-        <div class="update-refresh-title">⚠️ Game updated</div>
-        <div class="update-refresh-sub">Refreshing to the new version in <span class="update-refresh-num">10</span>s…</div>
-        <button class="btn gold wide update-refresh-now" type="button">Refresh now</button>
+<!-- GAME -->
+<section id="view-game" class="view hidden">
+  <header class="game-header">
+    <div class="hero-info">
+      <span id="hud-emoji" class="hud-emoji">🛡️</span>
+      <div>
+        <div id="hud-name" class="hud-name">Hero</div>
+        <div id="hud-level" class="hud-level">Lv 1</div>
       </div>
     </div>
-    <header id="hud">
-      <div class="hud-row">
-        <div class="hud-id">
-          <span class="hud-avatar"><img id="hud-avatar-img" src="img/avatar-knight.webp" alt="" width="44" height="44" onerror="this.remove()"><span id="hud-emoji">🛡️</span></span>
-          <div>
-            <div id="hud-username">—</div>
-            <div id="hud-sub"><span id="hud-role" class="role-badge">player</span><span id="hud-guild-pill" class="guild-pill hidden"></span><span id="hud-race" class="muted"></span></div>
-          </div>
-        </div>
-        <div class="hud-currencies">
-          <div>💰 <span id="hud-gold">0</span></div>
-          <div>⭐ <span id="hud-stars">0</span></div>
-          <div>🗺️ <span id="hud-stage">1</span></div>
-        </div>
-        <button id="inn-btn" class="btn inn-btn inn-top-btn" type="button" title="Rest at Inn — safe AFK" aria-label="Rest at Inn"><span class="inn-house">🏠</span></button>
-        <button id="balance-log-hud" class="btn inn-btn inn-top-btn" type="button" title="Balance Log — nerf &amp; patch notes" aria-label="Balance Log">⚖️<span id="balance-log-badge-hud" class="hud-newdot hidden"></span></button>
-        <button id="changelog-hud" class="btn inn-btn inn-top-btn" type="button" title="Patch Notes — what's new" aria-label="Patch Notes">📰<span id="changelog-badge-hud" class="hud-newdot hidden"></span></button>
-        <button id="friends-hud" class="btn inn-btn inn-top-btn" type="button" title="Friends" aria-label="Friends">👥<span id="friend-req-badge-hud" class="hud-count hidden"></span></button>
-        <button id="social-hud" class="btn inn-btn inn-top-btn" type="button" title="Socials" aria-label="Socials"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
-      </div>
-      <div class="hud-row">
-        <div class="hud-level">Lv <span id="hud-level">1</span></div>
-        <div class="bar xp"><div class="fill" id="hud-xpfill"></div><span class="bar-text" id="hud-xptext"></span></div>
-      </div>
-      <div class="hud-row online-row"><div class="online-count-badge">🟢 <span id="online-count">–</span> Online</div></div>
-      <div class="hud-row buff-row"><div id="buff-bar" class="buff-bar"></div></div>
-      <div class="hud-row save-row"><span id="save-indicator" class="save-ind">● saved</span></div>
-    </header>
-    <div id="pause-pill" class="pause-pill hidden" role="status" aria-live="polite">⏸ <b>PAUSED</b><span class="pause-sub"> — world frozen</span></div>
-    <div id="event-banner" class="hidden"></div>
+    <div class="hud-currencies">
+      <span>💰 <b id="hud-gold">0</b></span>
+      <span>🗺️ <b id="hud-stage">1</b></span>
+    </div>
+  </header>
 
-    <main id="tab-content">
-      <!-- REMASTER: AI Director farming panel -->
-      <div id="directive-mount"></div>
-      <!-- BATTLE -->
-      <section id="tab-battle" class="tab active">
-        <div class="mode-switch" id="mode-switch">
-          <button class="mode-btn" data-mode="clicker">👆<span>Clicker</span></button>
-          <button class="mode-btn" data-mode="auto">🤖<span>Auto</span></button>
-          <button class="mode-btn" data-mode="dungeon">🏰<span>Dungeon</span></button>
-          <button class="mode-btn" data-mode="raid">🌀<span>Raid</span></button>
-          <button class="mode-btn" data-mode="tower">🗼<span>Tower</span></button>
-        </div>
-        <div class="battle-main">
-          <div class="enemy-card" id="enemy-card">
-            <div class="enemy-top">
-              <div class="enemy-sprite" id="enemy-sprite">🐺</div>
-              <div class="enemy-info">
-                <div class="enemy-name" id="enemy-name">—</div>
-                <div class="enemy-stage" id="enemy-stage">Stage 1</div>
-              </div>
-              <div class="boss-badge hidden" id="boss-badge">BOSS</div>
-            </div>
-            <div class="bar hp enemy-hp"><div class="fill" id="enemy-hpfill"></div><span class="bar-text" id="enemy-hptext"></span></div>
-            <div class="boss-progress" id="boss-progress"><div class="boss-progress-fill" id="boss-progress-fill"></div><span class="boss-progress-text" id="boss-progress-text"></span></div>
-            <div class="enemy-atk" id="enemy-atk"></div>
-            <div class="float-layer" id="float-layer"></div>
-            <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
-          </div>
+  <div class="hp-bar"><div id="hero-hp-fill" class="hp-fill"></div><span id="hero-hp-text" class="bar-text"></span></div>
+  <div class="xp-bar"><div id="hero-xp-fill" class="xp-fill"></div></div>
 
-          <div class="hero-panel">
-            <div class="bar hp"><div class="fill" id="hero-hpfill"></div><span class="bar-text" id="hero-hptext"></span></div>
-            <div class="hero-stats" id="hero-stats"></div>
-            <div class="party-chips hidden" id="dungeon-chips"></div>
-          </div>
+  <main class="battle-area" id="battle-area">
+    <div id="enemy-emoji" class="enemy-emoji">🐺</div>
+    <div id="enemy-name" class="enemy-name">Dire Wolf</div>
+    <div id="boss-badge" class="boss-badge hidden">👹 BOSS</div>
+    <div class="hp-bar enemy-hp"><div id="enemy-hp-fill" class="hp-fill enemy-fill"></div><span id="enemy-hp-text" class="bar-text"></span></div>
+    <div id="float-layer" class="float-layer"></div>
+  </main>
 
-          <div class="battle-pet-hp hidden" id="battle-pet-hp">
-            <span class="bpet-label">🐾 Pet</span>
-            <div class="bpet-track"><div class="bpet-fill"></div></div>
-          </div>
-          <div class="meter" id="meter-panel">
-            <div class="meter-head">
-              <span class="meter-title">DAMAGE METER</span>
-              <span class="live-pill" id="meter-live"><span class="live-dot"></span>LIVE</span>
-              <span class="total-dps" id="total-dps">0 DPS</span>
-            </div>
-            <div id="meter-rows"></div>
-            <div class="meter-foot">shows last fight between kills &middot; updates every second</div>
-          </div>
-        </div>
+  <button id="attack-btn" class="attack-btn">⚔️<span>TAP TO ATTACK</span></button>
 
-        <div class="battle-side">
-          <button id="tap-btn" class="tap-btn">⚔️<span>TAP</span></button>
-          <div id="combo-meter" class="combo-meter hidden"></div>
-          <div id="skill-row" class="skill-row"></div>
+  <div id="loot-toast" class="loot-toast hidden"></div>
 
+  <nav class="tabbar">
+    <button class="tab-btn active" data-tab="battle">⚔️<span>Battle</span></button>
+    <button class="tab-btn" data-tab="character">👤<span>Hero</span></button>
+    <button class="tab-btn" data-tab="gear">🎒<span>Gear</span></button>
+    <button class="tab-btn" data-tab="settings">⚙️<span>Settings</span></button>
+  </nav>
 
-          <div class="combat-log" id="combat-log"></div>
-        </div>
-      </section>
+  <section id="tab-battle" class="tab active"></section>
 
-      <!-- MINE -->
-      <section id="tab-mine" class="tab">
-        <h2>⛏️ Deepdelve Mine</h2>
-        <p class="muted small" style="margin:0 0 8px">Shatter ore nodes, delve deeper, forge stronger pickaxes.</p>
-        <div id="mine-pickaxe" class="mine-pickaxe"></div>
-        <div id="mine-rock" class="mine-rock"></div>
-        <button id="mine-btn" class="btn tap-btn mine-btn"><span class="mine-emoji">⛏️</span><span>MINE</span></button>
-        <div id="mine-find" class="mine-find muted"></div>
-        <div id="mine-stats" class="mine-stats"></div>
-        <h2>💎 Ore Inventory</h2>
-        <div id="ore-grid" class="ore-grid"></div>
-        <h2>⛏️ Mining Shop</h2>
-        <p class="muted small" style="margin:4px 0">Buy pickaxes with ore + gold. Each tier must be bought in order — stronger picks mine deeper, faster.</p>
-        <div id="mining-shop" class="shop-grid"></div>
-      </section>
-
-
-      <!-- GEAR -->
-      <section id="tab-gear" class="tab">
-        <h2>Loadout</h2>
-        <div id="loadout-strip" class="loadout-strip"></div>
-        <h2>Upgrades</h2>
-        <div id="upgrade-list" class="upgrade-list"></div>
-        <h2>Inventory <span id="inv-count" class="muted"></span></h2>
-        <div class="inv-actions">
-          <label class="autosell-toggle"><input type="checkbox" id="autosell-checkbox"> <span>💰 Auto-sell loot</span></label>
-        </div>
-        <div id="set-progress" class="set-progress"></div>
-        <div id="inventory-grid" class="inv-grid"></div>
-      </section>
-
-      <!-- ARMORY -->
-      <section id="tab-armory" class="tab">
-        <h2>⚒️ Armory</h2>
-        <p class="muted small">Masterwork class gear, forged for your class. Below, sell your spare gear for gold.</p>
-        <h2>Buy</h2>
-        <div id="armory-stock" class="gear-shop"></div>
-        <h2>Sell for gold</h2>
-        <div class="inv-actions">
-          <button id="clear-bags" class="btn small">🗑️ Sell All</button>
-        </div>
-        <div id="armory-sell" class="armory-sell"></div>
-        <h2>🌌 Galaxy Forge</h2>
-        <div id="forge-section" class="forge-section"></div>
-      </section>
-
-      <!-- TOKEN SHOP -->
-
-      <!-- PETS -->
-      <section id="tab-pets" class="tab">
-        <div id="pets-section"></div>
-      </section>
-
-      <!-- TALENTS -->
-      <section id="tab-talents" class="tab">
-        <div id="talents-root"></div>
-      </section>
-
-      <!-- PARTY -->
-      <section id="tab-party" class="tab">
-        <div class="row-between">
-          <h2 style="margin:0">🎉 Party</h2>
-          <button id="mp-refresh" class="btn small ghost" title="Refresh party">↻ Refresh</button>
-        </div>
-        <div id="mp-party-card" class="card"></div>
-        <div class="card" id="mp-join-card">
-          <h3>🔗 Join a party</h3>
-          <div class="row">
-            <input id="mp-join-code" class="text-input" placeholder="6-letter code" maxlength="6"
-              autocapitalize="characters" autocomplete="off" spellcheck="false" />
-            <button id="mp-join-btn" class="btn gold">Join</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3>🛡️ NPC allies</h3>
-          <p class="muted small">Your dungeon party fights beside you in Dungeon mode (up to 3 companions). Each ally also grants <b>+4% XP</b>.</p>
-          <div id="party-synergy" class="hidden"></div>
-        <div id="party-slots" class="party-slots"></div>
-          <h3>Recruit</h3>
-          <div id="recruit-list" class="recruit-list"></div>
-        </div>
-      </section>
-
-      <!-- RANKS -->
-      <section id="tab-ranks" class="tab">
-        <div class="row-between">
-          <h2 style="margin:0">🏆 Leaderboard</h2>
-          <div class="row-gap">
-            <button id="lb-refresh" class="btn small ghost">↻ Refresh</button>
-          </div>
-        </div>
-        <div class="subtabs" id="ranks-subtabs" role="tablist" aria-label="Ranks views">
-          <button class="subtab active" data-subtab="board">🏆 Board</button>
-          <button class="subtab" data-subtab="friends">👥 Friends<span id="friend-req-badge" class="req-badge hidden"></span></button>
-        </div>
-        <div id="lb-board-view">
-          <div class="lb-cats" id="lb-cats" role="tablist" aria-label="Leaderboard category">
-            <button class="lb-cat active" id="lb-cat-heroes" data-lbcat="heroes" role="tab" aria-selected="true">🦸 Heroes</button>
-            <button class="lb-cat" id="lb-cat-guilds" data-lbcat="guilds" role="tab" aria-selected="false">🏰 Guilds</button>
-            <button class="lb-cat active" data-by="level">🎖️ Level</button>
-            <button class="lb-cat" data-by="stage">🗺️ Stage</button>
-            <button class="lb-cat" data-by="bosses">👑 Bosses</button>
-            <button class="lb-cat" data-by="kills">⚔️ Kills</button>
-            <button class="lb-cat" data-by="depth">⛏️ Depth</button>
-          </div>
-          <div class="muted small lb-note" id="lb-note"></div>
-          <div id="lb-me" class="lb-me hidden" role="status"></div>
-          <div class="lb-list" id="lb-body"></div>
-        </div>
-        <div id="friends-panel" class="hidden"></div>
-      </section>
-
-      <!-- GUILD -->
-      <section id="tab-guild" class="tab">
-        <div class="card" id="guild-card">
-          <h3>🏰 Guild</h3>
-          <div id="guild-section"><p class="muted small">Loading…</p></div>
-        </div>
-      </section>
-
-      <!-- QUESTS -->
-      <section id="tab-quests" class="tab">
-        <div class="row-between">
-          <h2 style="margin:0">📜 Quests</h2>
-          <span class="muted small">daily @ UTC midnight · weekly Mon 00:00 UTC</span>
-        </div>
-        <div id="quest-daily"></div>
-        <div id="quest-weekly"></div>
-        <div id="quest-guide"></div>
-        <div id="quest-class"></div>
-        <div id="quest-mastery"></div>
-      </section>
-
-      <!-- STATS -->
-      <section id="tab-stats" class="tab">
-        <div id="stats-card" class="card"></div>
-      </section>
-
-
-      <!-- INN (AFK safe zone) -->
-      <section id="tab-inn" class="tab">
-        <div class="inn-scene">
-          <img class="inn-bg" src="img/inn-bg.webp" alt="Warm tavern interior on a stormy night">
-          <canvas id="inn-glow" aria-hidden="true"></canvas>
-          <div class="inn-panel">
-            <h2>🏠 The Shadowed Hearth</h2>
-            <p class="muted small">Safe from the storm — and everything else. Rest here as long as you like; nothing can hurt you.</p>
-            <div class="bar hp"><div class="fill" id="inn-hpfill"></div><span class="bar-text" id="inn-hptext"></span></div>
-            <div id="inn-status" class="inn-status">💤 Resting…</div>
-            <button id="leave-inn-btn" class="btn gold wide" type="button">⚔️ Leave Inn</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- MORE -->
-      <section id="tab-settings" class="tab">
-        <div class="card">
-          <h2>⚙️ Settings</h2>
-          
-          <h3>🎵 Music</h3>
-          <div class="setting-row">
-            <label class="setting">
-              <input type="checkbox" id="set-music"> Music
-              <span class="muted small">(ambient tracks)</span>
-            </label>
-          </div>
-          <div class="setting-row">
-            <label class="setting">Music volume</label>
-            <input type="range" id="set-music-vol" min="0" max="100" value="50">
-          </div>
-          <div class="setting-row">
-            <label class="setting">Track</label>
-            <select id="set-music-track">
-              <option value="shadow-requiem">Shadow Requiem</option>
-              <option value="void-hymn">Void Hymn</option>
-              <option value="ember-tavern">Ember Tavern</option>
-              <option value="war-horns">War Horns</option>
-              <option value="frostfall">Frostfall</option>
-            </select>
-          </div>
-
-          <h3>🔊 Sound FX</h3>
-          <div class="setting-row">
-            <label class="setting">
-              <input type="checkbox" id="set-sfx"> Sound effects
-            </label>
-          </div>
-          <div class="setting-row">
-            <label class="setting">SFX volume</label>
-            <input type="range" id="set-sfx-vol" min="0" max="100" value="50">
-          </div>
-
-          <h3>🎨 UI Style</h3>
-          <div class="setting-row">
-            <label class="setting">Interface style</label>
-            <select id="set-ui-style">
-              <option value="classic" selected>Classic</option>
-              <option value="modern">Modern</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <label class="setting">
-              <input type="checkbox" id="set-perf"> Performance mode
-              <span class="muted small">(disables animations)</span>
-            </label>
-          </div>
-
-          <h3>👤 Account</h3>
-          <div class="setting-row">
-            <button id="logout-btn" class="btn danger wide">🚪 Log Out</button>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <nav id="tabbar">
-      <button class="tab-btn" id="character-open"><span class="ticon">👤</span><span>Character</span></button>
-      <button class="tab-btn active" data-tab="battle"><span class="ticon">⚔️</span><span>Battle</span></button>
-      <button class="tab-btn" id="spellbook-open"><span class="ticon">📖</span><span>Spells</span></button>
-      <button class="tab-btn" data-tab="mine"><span class="ticon">⛏️</span><span>Mine</span></button>
-      <button class="tab-btn" data-tab="gear"><span class="ticon">🎒</span><span>Inventory</span></button>
-      <button class="tab-btn" data-tab="armory"><span class="ticon">⚒️</span><span>Armory</span></button>
-      <button class="tab-btn" data-tab="pets"><span class="ticon">🐾</span><span>Pets</span></button>
-      <button class="tab-btn" data-tab="party"><span class="ticon">👥</span><span>Party</span></button>
-      <button class="tab-btn" data-tab="ranks"><span class="ticon">🏆</span><span>Ranks</span></button>
-      <button class="tab-btn" data-tab="guild"><span class="ticon">🏰</span><span>Guild</span></button>
-      <button class="tab-btn" data-tab="quests"><span class="ticon">📜</span><span>Quests</span></button>
-      <button class="tab-btn" data-tab="talents"><span class="ticon">🌳</span><span>Talents</span></button>
-      <button class="tab-btn" data-tab="stats"><span class="ticon">📊</span><span>Stats</span></button>
-      <button class="tab-btn" data-tab="settings"><span class="ticon">⚙️</span><span>Settings</span></button>
-      <button class="tab-btn" id="realm-open"><span class="ticon">🌐</span><span>Realm</span></button>
-      <button class="tab-btn hidden" data-tab="staff" id="tabbtn-staff"><span class="ticon">🛠️</span><span>Staff</span></button>
-    </nav>
+  <section id="tab-character" class="tab hidden">
+    <h2>👤 <span id="char-name">Hero</span></h2>
+    <div id="char-stats" class="stat-grid"></div>
+    <h3>Equipped</h3>
+    <div id="equipped-list" class="gear-list"></div>
   </section>
 
-  <!-- ============ GM CONSOLE ============ -->
+  <section id="tab-gear" class="tab hidden">
+    <h2>🎒 Inventory</h2>
+    <div id="inventory-list" class="gear-list"></div>
+  </section>
 
-</div>
+  <section id="tab-settings" class="tab hidden">
+    <h2>⚙️ Settings</h2>
+    <button id="logout-btn" class="btn">Log Out</button>
+  </section>
+</section>
 
-<div id="modal-root"></div>
-<div id="gm-rainbow-frame"></div>
-<div id="toast-root"></div>
-
-<script type="module" src="js/app.js?v20261004m"></script>
-<script type="module" src="js/gamepad.js?v=20261004j"></script>
+<script type="module" src="js/game.js"></script>
 </body>
 </html>
