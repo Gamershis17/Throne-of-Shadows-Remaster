@@ -677,3 +677,112 @@ body {
   margin: 0 auto;
   min-height: calc(100vh - 70px);
 }
+
+/* --- Original-style Login --- */
+.login-original {
+  background: linear-gradient(180deg, #2a1a3a 0%, #1a0f2a 100%);
+  min-height: 100vh;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.game-tagline {
+  color: #9a8ab0;
+  font-size: 12px;
+  letter-spacing: 3px;
+  margin: 8px 0 24px;
+  font-style: italic;
+}
+
+.login-card {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid #4a3a5a;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.login-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.login-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #9a8ab0;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.login-tab.active {
+  background: rgba(255,210,63,0.1);
+  border-color: #ffd23f;
+  color: #ffd23f;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin: 8px 0;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #3a2a4a;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder { color: #6a5a7a; }
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  margin: 12px 0;
+  font-size: 18px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  color: #6a5a7a;
+}
+
+.login-divider::before, .login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #3a2a4a;
+}
+
+.login-divider span { padding: 0 16px; }
+
+.login-note {
+  color: #6a5a7a;
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+.discord-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto 0;
+  padding: 16px;
+  background: #5865F2;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
