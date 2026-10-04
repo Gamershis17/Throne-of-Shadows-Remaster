@@ -355,14 +355,19 @@ body {
   left: 0;
   right: 0;
   display: flex;
+  overflow-x: auto;
   background: linear-gradient(180deg, #1e1a14 0%, #0d0a08 100%);
   border-top: 2px solid #4a3a1a;
   padding-bottom: env(safe-area-inset-bottom);
+  scrollbar-width: none;
 }
 
+.tabbar::-webkit-scrollbar { display: none; }
+
 .tab-btn {
-  flex: 1;
-  padding: 10px 4px;
+  flex: 0 0 auto;
+  min-width: 72px;
+  padding: 10px 8px;
   background: none;
   border: none;
   border-right: 1px solid #2a2418;
