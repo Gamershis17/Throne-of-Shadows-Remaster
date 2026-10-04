@@ -7359,3 +7359,57 @@ body[data-uistyle="modern"] .btn {
     font-size: 24px;
   }
 }
+
+/* ============================================================
+   REMASTER: PC Sidebar Layout (2D MMO style)
+   ============================================================ */
+@media (min-width: 1024px) {
+  #view-app {
+    display: flex;
+    padding-bottom: 0;
+  }
+  
+  #tabbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 200px;
+    min-width: 200px;
+    height: 100vh;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px 12px;
+    background: linear-gradient(180deg, #141020 0%, #0a0812 100%);
+    border-right: 1px solid rgba(212, 160, 23, 0.2);
+    overflow-y: auto;
+  }
+  
+  #tabbar .tab-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    border-left: 3px solid transparent;
+    margin-bottom: 4px;
+    min-height: auto;
+  }
+  
+  #tabbar .tab-btn.active {
+    background: rgba(212, 160, 23, 0.1);
+    border-left-color: #ffd23f;
+    border-bottom: none;
+  }
+  
+  #tabbar .tab-btn .ticon {
+    font-size: 20px;
+    margin: 0;
+  }
+  
+  #tab-content {
+    flex: 1;
+    padding: 24px;
+    max-width: 1200px;
+  }
+}
