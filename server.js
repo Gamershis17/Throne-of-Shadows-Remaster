@@ -24,6 +24,22 @@ async function initDb() {
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS accounts (
+        username TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'player',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    // Seed GM account (password: set via GM_USERS env or default)
+    const gmPass = process.env.GM_PASSWORD || 'throne2026';
+    const hash = await bcrypt.hash(gmPass, 10);
+    await pool.query(`
+      INSERT INTO accounts (username, password_hash, role)
+      VALUES ('Gamershis17', $1, 'gm'), ('Jass', $1, 'gm')
+      ON CONFLICT (username) DO NOTHING
+    `, [hash]);
     console.log('Database ready');
   } catch (e) {
     console.error('DB init failed (non-fatal):', e.message);
@@ -90,9 +106,19 @@ let gmAnnouncement = null;
 const feedbackList = [];
 
 function isGM(req) {
+  // Check logged-in account first
+  if (req.session.user && (req.session.user.role === 'gm' || GMS.includes(req.session.user.username))) {
+    return true;
+  }
+  // Fallback: guest name
   const guest = req.session.guest;
   if (!guest) return false;
   return GMS.includes(guest.name);
+}
+
+function getUserRole(req) {
+  if (req.session.user) return req.session.user.role;
+  return 'player';
 }
 
 // GM can set player roles
@@ -115,6 +141,9 @@ app.post('/api/gm/setrole/:name', async (req, res) => {
 
 // Get own role
 app.get('/api/role', async (req, res) => {
+  if (req.session.user) {
+    return res.json({ ok: true, role: req.session.user.role, username: req.session.user.username });
+  }
   const guest = req.session.guest;
   if (!guest) return res.json({ ok: true, role: 'player' });
   const role = await getRole(guest.name);
