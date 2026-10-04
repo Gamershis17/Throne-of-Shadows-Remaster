@@ -136,6 +136,8 @@ export function heroStats(hero) {
   let def = cls.baseDef + cls.defPerLevel * (hero.level - 1);
   let critChance = cls.critChance;
   let critMult = cls.critMult;
+  // Mana scales with level
+  let mana = 50 + hero.level * 5;
 
   for (const slot of Object.values(hero.gear)) {
     if (!slot) continue;
@@ -143,9 +145,10 @@ export function heroStats(hero) {
     atk += slot.atk || 0;
     def += slot.def || 0;
     critChance += slot.critChance || 0;
+    mana += slot.mana || 0;
   }
 
-  return { hp: Math.floor(hp), atk: Math.floor(atk), def: Math.floor(def), critChance, critMult };
+  return { hp: Math.floor(hp), atk: Math.floor(atk), def: Math.floor(def), critChance, critMult, mana: Math.floor(mana) };
 }
 
 // Generate an enemy for a stage

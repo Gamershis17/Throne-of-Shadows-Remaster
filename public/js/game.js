@@ -9,8 +9,11 @@ const $ = (id) => document.getElementById(id);
 let hero = null;
 let enemy = null;
 let heroHp = 0;
+let heroMana = 0;
 let selectedClass = 'warrior';
 let autoTimer = null;
+let manaTimer = null;
+let spellCooldowns = {};
 
 // --- Class Select ---
 function renderClasses() {
@@ -35,7 +38,9 @@ function renderClasses() {
 $('start-btn').onclick = async () => {
   const name = ($('hero-name').value || 'Hero').slice(0, 16);
   hero = Engine.createHero(name, selectedClass);
-  heroHp = Engine.heroStats(hero).hp;
+  const st = Engine.heroStats(hero);
+  heroHp = st.hp;
+  heroMana = st.mana;
 
   // Save to server session
   try {
@@ -75,6 +80,22 @@ function renderSpells() {
     btn.innerHTML = `${spell.emoji}<span>${spell.name}</span>`;
     btn.title = spell.desc;
     btn.onclick = () => {
+      // Check cooldown
+      const now = Date.now();
+      if (spellCooldowns[spell.id] && now < spellCooldowns[spell.id]) {
+        const s = Math.ceil((spellCooldowns[spell.id] - now) / 1000);
+        toast(`⏳ ${spell.name} ready in ${s}s`);
+        return;
+      }
+      // Check mana
+      if (heroMana < spell.mana) {
+        toast(`💧 Not enough mana!`);
+        return;
+      }
+      heroMana -= spell.mana;
+      spellCooldowns[spell.id] = now + (spell.cd * 1000);
+      updateManaBar();
+
       const result = Engine.castSpell(hero, spell.id, enemy, heroHp, Engine.heroStats(hero).hp);
       if (!result) return;
       if (result.damage > 0) {
@@ -89,6 +110,9 @@ function renderSpells() {
           toast('💚 Pet fed and happy!');
         }
       }
+      // Visual cooldown
+      btn.style.opacity = '0.5';
+      setTimeout(() => btn.style.opacity = '1', spell.cd * 1000);
     };
     bar.appendChild(btn);
   }
@@ -342,6 +366,22 @@ function startAutoAttack() {
   autoTimer = setInterval(() => {
     if (enemy && enemy.hp > 0 && heroHp > 0) doAttack();
   }, 3000); // Auto-attack every 3s
+  // Mana regen
+  clearInterval(manaTimer);
+  manaTimer = setInterval(() => {
+    const max = Engine.heroStats(hero).mana;
+    heroMana = Math.min(max, heroMana + Math.floor(max * 0.05));
+    updateManaBar();
+  }, 1000);
+}
+
+function updateManaBar() {
+  const max = Engine.heroStats(hero).mana;
+  const pct = (heroMana / max) * 100;
+  const fill = $('hero-mana-fill');
+  const text = $('hero-mana-text');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = `${heroMana} / ${max}`;
 }
 
 $('attack-btn').addEventListener('pointerdown', (e) => {
