@@ -299,6 +299,32 @@ app.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
 });
 
+app.post('/api/change-password', async (req, res) => {
+  const user = req.session.user;
+  if (!user || !pool) return res.json({ ok: false, error: 'Not logged in' });
+  const { current, newPass } = req.body || {};
+  if (!current || !newPass || newPass.length < 4) {
+    return res.json({ ok: false, error: 'New password min 4 chars' });
+  }
+  try {
+    const r = await pool.query(
+      'SELECT password_hash FROM accounts WHERE username = $1',
+      [user.username]
+    );
+    if (!r.rows[0]) return res.json({ ok: false });
+    const valid = await bcrypt.compare(current, r.rows[0].password_hash);
+    if (!valid) return res.json({ ok: false, error: 'Current password wrong' });
+    const hash = await bcrypt.hash(newPass, 10);
+    await pool.query(
+      'UPDATE accounts SET password_hash = $1 WHERE username = $2',
+      [hash, user.username]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false, error: 'Failed' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Throne of Shadows Remaster running on port ${PORT}`);
 });

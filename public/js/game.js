@@ -1278,6 +1278,25 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   };
 });
 
+$('pw-change-btn').onclick = async () => {
+  const current = $('pw-current').value;
+  const newPass = $('pw-new').value;
+  if (!current || !newPass) { toast('Fill in both fields'); return; }
+  const r = await fetch('/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ current, newPass }),
+  });
+  const d = await r.json();
+  if (d.ok) {
+    toast('🔑 Password changed!');
+    $('pw-current').value = '';
+    $('pw-new').value = '';
+  } else {
+    toast(d.error || 'Failed');
+  }
+};
+
 $('logout-btn').onclick = async () => {
   try { await fetch('/api/logout', { method: 'POST' }); } catch {}
   localStorage.removeItem('tos-hero');
