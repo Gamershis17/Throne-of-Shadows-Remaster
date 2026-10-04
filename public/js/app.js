@@ -421,6 +421,13 @@ async function boot() {
 // The auth screen: login/register tabs plus the guest entry point.
 function showAuthView() {
   UI.showView('auth');
+  // REMASTER: start the login overture (calm -> epic build)
+  try {
+    if (typeof Audio !== 'undefined' && Audio.startLoginMusic) {
+      // Delay slightly so the first user gesture (click) can unlock audio
+      setTimeout(() => Audio.startLoginMusic(), 500);
+    }
+  } catch {}
   Auth.init({ onAuthed: (u) => enterApp(u), onGuest: (n) => enterGuest(n) });
 }
 
@@ -532,6 +539,13 @@ async function enterGuest(name) {
 
 async function enterAppWithState(user, raw, lastSeenAt) {
   App.user = user;
+
+  // REMASTER: crossfade from login overture to in-game music
+  try {
+    if (typeof Audio !== 'undefined' && Audio.transitionToGameMusic) {
+      Audio.transitionToGameMusic();
+    }
+  } catch {}
 
   // Server gold cap (owner-adjustable); failure keeps the built-in default.
   // Also picks up the active server event buff (double XP/gold weekends).

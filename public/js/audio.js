@@ -159,6 +159,27 @@ const TRACKS = {
     pluckScale: [196.0, 246.94, 293.66, 329.63, 392.0], // low, brutal
     pluckGap: [0.8, 2.0],
   },
+  // ===== REMASTER: login theme (calm -> epic build) =====
+  // 8-chord progression: starts sparse and atmospheric, builds to full epic.
+  // The scheduler reads buildUp to gradually increase intensity.
+  'remaster-login': {
+    name: 'Remaster Overture',
+    chords: [
+      [110.0, 164.81],                    // Am (sparse): A2 E3 - calm open
+      [87.31, 130.81],                    // F (sparse):  F2 C3
+      [110.0, 130.81, 164.81],            // Am:  A2 C3 E3 - filling in
+      [98.0, 123.47, 146.83],             // G:   G2 B2 D3
+      [87.31, 110.0, 130.81, 164.81],     // F:   F2 A2 C3 E3 - richer
+      [82.41, 98.0, 123.47, 146.83],      // Em:  E2 G2 B2 D3
+      [73.42, 87.31, 110.0, 130.81, 164.81], // Dm: D2 F2 A2 C3 E3 - epic
+      [82.41, 110.0, 130.81, 164.81, 196.0],  // Em: E2 A2 C3 E3 G3 - climax
+    ],
+    chordSecs: 10,
+    pluckScale: [220.0, 261.63, 293.66, 329.63, 392.0, 440.0, 523.25],
+    pluckGap: [4.0, 9.0],       // starts sparse
+    pluckGapEnd: [1.0, 2.5],    // ends dense (epic)
+    buildUpSecs: 80,            // full build over 80 seconds, then loops at epic
+  },
   'tower-apotheosis': {
     name: 'Tower Apotheosis',
     chords: [
@@ -338,9 +359,55 @@ export const Audio = {
     this._switchTrack(track);
   },
 
+  // REMASTER: smooth crossfade to a new track over `secs` seconds.
+  // Fades out current music gain, switches track, fades back in.
+  crossfadeTo(id, secs = 3) {
+    try {
+      if (!this._ctx || !this._musicGain) { this.setTrack(id); return; }
+      const t = this._ctx.currentTime;
+      const g = this._musicGain.gain;
+      g.cancelScheduledValues(t);
+      g.setValueAtTime(g.value, t);
+      g.linearRampToValueAtTime(0.0001, t + secs / 2);
+      setTimeout(() => {
+        try {
+          this.setTrack(id);
+          if (!this._ctx || !this._musicGain) return;
+          const t2 = this._ctx.currentTime;
+          const g2 = this._musicGain.gain;
+          g2.cancelScheduledValues(t2);
+          g2.setValueAtTime(0.0001, t2);
+          g2.linearRampToValueAtTime(this._musicLevel(), t2 + secs / 2);
+        } catch {}
+      }, (secs / 2) * 1000);
+    } catch { try { this.setTrack(id); } catch {} }
+  },
+
+  // REMASTER: start login music (call on auth view show)
+  startLoginMusic() {
+    try {
+      this._ensureCtx();
+      if (this._musicTrackId !== 'remaster-login') {
+        this.setTrack('remaster-login');
+      }
+      this._startMusic();
+    } catch {}
+  },
+
+  // REMASTER: crossfade from login to in-game music (call on successful login)
+  transitionToGameMusic() {
+    try {
+      const gameTrack = (this.prefs && this.prefs.track && this.prefs.track !== 'remaster-login')
+        ? this.prefs.track
+        : 'shadow-requiem';
+      this.crossfadeTo(gameTrack, 4);
+    } catch {}
+  },
+
   _switchTrack(track) {
     this._musicTrackId = track;
     this._musicChord = 0;
+    this._trackStartTime = this._ctx ? this._ctx.currentTime : 0;
     if (this._ctx) {
       this._musicPluckAt = this._ctx.currentTime + 2.5;
       // Fade out ringing pads from the previous track so the switch is
@@ -684,7 +751,14 @@ export const Audio = {
         const scale = track.pluckScale;
         const f = scale[Math.floor(Math.random() * scale.length)];
         this._pluck(f, this._musicPluckAt);
-        const [g0, g1] = track.pluckGap;
+        // REMASTER: build-up intensity - lerp pluck gap from sparse to dense
+        let g0 = track.pluckGap[0], g1 = track.pluckGap[1];
+        if (track.buildUpSecs && track.pluckGapEnd && this._ctx) {
+          const elapsed = this._ctx.currentTime - (this._trackStartTime || 0);
+          const t = Math.min(1, elapsed / track.buildUpSecs);
+          g0 = track.pluckGap[0] + (track.pluckGapEnd[0] - track.pluckGap[0]) * t;
+          g1 = track.pluckGap[1] + (track.pluckGapEnd[1] - track.pluckGap[1]) * t;
+        }
         this._musicPluckAt += g0 + Math.random() * (g1 - g0);
       }
     } catch { /* ignore */ }
