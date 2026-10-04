@@ -484,7 +484,7 @@ export const UI = {
         this.handlers.onBuyTokenItem(btn.dataset.id);
       }
     });
-    // Pets tab: delegated pet + breeding actions
+    // Pets tab: delegated pet actions
     listen('tab-pets', 'click', (e) => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
@@ -516,10 +516,6 @@ export const UI = {
       if (btn.dataset.action === 'recruit-tank' && h.onRecruitTank) h.onRecruitTank();
       if (btn.dataset.action === 'dismiss-tank' && h.onDismissTank) h.onDismissTank();
       if (btn.dataset.action === 'buy-egg' && h.onBuyEgg) h.onBuyEgg(btn.dataset.tier);
-      if (btn.dataset.action === 'breed-select') this._toggleBreedSelect(btn.dataset.id);
-      if (btn.dataset.action === 'combine-select') this._toggleCombineSelect(btn.dataset.id);
-      if (btn.dataset.action === 'do-breed' && h.onBreedPets) h.onBreedPets();
-      if (btn.dataset.action === 'do-combine' && h.onCombinePets) h.onCombinePets();
       // Sell pet: two-step confirm. First tap arms the button ("Tap again to
       // confirm"); the second tap (within 6s) fires the sale.
       if (btn.dataset.action === 'sell-pet' && h.onSellPet) {
@@ -4816,65 +4812,8 @@ export const UI = {
 
   // ---------------- pets ----------------
   // Pets live in their own 🐾 Pets tab: the Pet Shop (tiered eggs for gold),
-  // your collection, and the Breeding Den. Wild eggs drop from bosses (15%).
+  // your collection, . Wild eggs drop from bosses (15%).
   // All hatching is instant from here.
-  _breedSel: [],
-  _combineSel: [],
-  _toggleBreedSelect(uid) {
-    const i = this._breedSel.indexOf(uid);
-    if (i >= 0) this._breedSel.splice(i, 1);
-    else if (this._breedSel.length < 2) this._breedSel.push(uid);
-    else { this._breedSel.shift(); this._breedSel.push(uid); }
-    this._refreshBreedPanel();
-  },
-  _toggleCombineSelect(uid) {
-    const i = this._combineSel.indexOf(uid);
-    if (i >= 0) this._combineSel.splice(i, 1);
-    else if (this._combineSel.length < 3) this._combineSel.push(uid);
-    this._refreshBreedPanel();
-  },
-  _petChip(uid) {
-    const st = this._breedState;
-    const pet = st && st.collection.find(x => x.uid === uid);
-    if (!pet) return '<span class="muted">—</span>';
-    const sp = Engine.petSpeciesOf(pet);
-    return `<span class="breed-chip">${this.petIconHtml(sp, 'pet-chip-icon')}<span>${esc(sp.name)} <span class="muted small">Lv ${pet.level}</span></span></span>`;
-  },
-  _refreshBreedPanel() {
-    const st = this._breedState;
-    if (!st) return;
-    const breedBox = document.getElementById('breed-picks');
-    const combBox = document.getElementById('combine-picks');
-    if (breedBox) {
-      const [a, b] = this._breedSel;
-      const cost = (a && b) ? 5000 * (Math.max(1, (st.collection.find(x => x.uid === a) || {}).level || 1) + Math.max(1, (st.collection.find(x => x.uid === b) || {}).level || 1)) : 0;
-      breedBox.innerHTML = `
-        <div class="breed-slots">${this._petChip(a)}<span class="muted">+</span>${this._petChip(b)}</div>
-        <div class="row-between" style="margin-top:8px">
-          <span class="muted small">${a && b ? `Cost: 💰${formatNum(cost)}` : 'Tap 💕 on two pets to pick parents'}</span>
-          <button class="btn small success" data-action="do-breed" ${a && b ? '' : 'disabled'}>💕 Breed</button>
-        </div>`;
-    }
-    if (combBox) {
-      const picks = this._combineSel;
-      const rarities = picks.map(u => { const pet = st.collection.find(x => x.uid === u); return pet ? Engine.petSpeciesOf(pet).rarity : null; });
-      const sameRarity = picks.length === 3 && new Set(rarities).size === 1;
-      const topRarity = sameRarity && rarities[0] === 'celestial';
-      combBox.innerHTML = `
-        <div class="breed-slots">${picks.map(u => this._petChip(u)).join('<span class="muted">+</span>') || '<span class="muted">—</span>'}</div>
-        <div class="row-between" style="margin-top:8px">
-          <span class="muted small">${picks.length < 3 ? 'Tap 🔀 on three pets of the same rarity' : topRarity ? 'Already max rarity!' : sameRarity ? `→ next rarity up, keeps highest level` : '⚠️ All three must share a rarity'}</span>
-          <button class="btn small success" data-action="do-combine" ${sameRarity && !topRarity ? '' : 'disabled'}>🔀 Combine</button>
-        </div>`;
-    }
-    // Highlight selected cards.
-    document.querySelectorAll('#tab-pets .pet-slot').forEach(card => {
-      const id = card.dataset.id;
-      card.classList.toggle('breed-pick', this._breedSel.includes(id));
-      card.classList.toggle('combine-pick', this._combineSel.includes(id));
-    });
-  },
-
   // ---------------- pet system UI ----------------
   // Rarity → slot border class (mirrors Engine.PET_RARITY_ORDER).
   petRarityCls(rarity) { return 'rarity-' + (rarity || 'common'); },
@@ -4990,8 +4929,6 @@ export const UI = {
       ? `<button class="btn small ghost sell-btn" data-action="sell-pet" data-id="${esc(pet.uid)}" data-sell-text="${esc(sellLabel)}" title="Sell this pet for gold"><span class="sell-label">${esc(sellLabel)}</span></button>`
       : `<span class="muted small" title="This pet is special and cannot be sold">\u{1F512} unsellable</span>`;
     const feedBtn = `<button class="btn small" data-action="feed-pet" data-id="${esc(pet.uid)}" ${pet.hunger >= 100 ? 'disabled' : ''}>\u{1F356} Feed (\u{1F4B0}${formatNum(cost)})</button>`;
-    const breedBtn = `<button class="btn small ghost" data-action="breed-select" data-id="${esc(pet.uid)}" title="Select for breeding">\u{1F495}</button>`;
-    const combineBtn = sp.unsellable ? '' : `<button class="btn small ghost" data-action="combine-select" data-id="${esc(pet.uid)}" title="Select for combining">\u{1F500}</button>`;
     const petBtns = [feedBtn, setActiveBtn, secondBtn, breedBtn, combineBtn, sellBtn].filter(Boolean).join('<span class="btn-sep" aria-hidden="true">|</span>');
     return `<div class="pet-slot is-expanded ${rcls}${active ? ' is-active' : ''}" data-action="pet-select" data-id="${esc(pet.uid)}">
       <div class="pet-xhead">${this.petIconHtml(sp, 'pet-xicon')}
@@ -5108,18 +5045,6 @@ export const UI = {
     grid.innerHTML = this.petCollectionHtml(state, p);
     panel.appendChild(grid);
 
-    // --- Breeding Den ---
-    const den = document.createElement('div');
-    den.className = 'breeding-den';
-    den.innerHTML = `
-      <h2>💕 Breeding Den</h2>
-      <p class="muted small" style="margin:4px 0">Breed two pets for a gold fee — the egg hatches a Lv 1 pet (45/45% parent species, 10% mutation of the higher rarity). Combine <b>three pets of the same rarity</b> into one pet of the next rarity up — keeps the highest level. Celestial pets are max rarity.</p>
-      <h3>Breed</h3>
-      <div id="breed-picks" class="breed-box"></div>
-      <h3>Combine</h3>
-      <div id="combine-picks" class="breed-box"></div>`;
-    panel.appendChild(den);
-    this._refreshBreedPanel();
   },
 
   // ---------------- token shop ----------------
@@ -5794,8 +5719,7 @@ export const UI = {
     // Safety: guard against missing element (stale HTML after deploy).
     const pcEl = this.els['profile-card'];
     if (pcEl) pcEl.innerHTML = `
-      ${this.professionsCard(state)}
-      ${this.achievementsCard(state)}`;
+`;
     this.checkChangelogBadge();
     this.checkBalanceBadge();
   },
@@ -6042,36 +5966,7 @@ export const UI = {
     }
   },
 
-  professionsCard(state) {
-    const rows = Object.entries(Engine.PROFESSIONS).map(([id, p]) => {
-      const lvl = (state.professions && state.professions[id]) || 1;
-      const maxed = lvl >= p.max;
-      const cost = maxed ? null : Engine.professionCost(lvl);
-      const afford = cost != null && (state.gold || 0) >= cost;
-      return `<div class="talent-row">
-        <div class="talent-info"><span class="talent-emoji">${p.emoji}</span>
-          <div><div class="talent-name">${esc(p.name)} <b>Lv ${lvl}</b></div>
-          <div class="muted small">${esc(p.desc)}</div></div></div>
-        <button class="btn small ${!maxed && afford ? '' : 'disabled'}" data-action="prof" data-id="${id}"
-          ${maxed || !afford ? 'disabled' : ''}>${maxed ? 'MAX' : `💰 ${formatNum(cost)}`}</button>
-      </div>`;
-    }).join('');
-    return `<div class="card sub-card"><h3>⚒️ Professions <span class="muted small">(leveled with gold, always active)</span></h3>${rows}</div>`;
-  },
 
-  achievementsCard(state) {
-    const unlocked = new Set(state.achievements || []);
-    const cards = Engine.ACHIEVEMENTS.map(a => {
-      const got = unlocked.has(a.id);
-      return `<div class="ach-card ${got ? '' : 'locked'}">
-        <div class="ach-emoji">${a.emoji}</div>
-        <div class="ach-name">${esc(a.name)}</div>
-        <div class="muted small">${esc(a.desc)}</div>
-        <div class="ach-reward">+${a.stars} ⭐</div>
-      </div>`;
-    }).join('');
-    return `<div class="card sub-card"><h3>🏆 Achievements <span class="muted small">(${unlocked.size}/${Engine.ACHIEVEMENTS.length})</span></h3><div class="ach-grid">${cards}</div></div>`;
-  },
 
   // ---------------- Class talent trees ----------------
   renderTalents(state) {

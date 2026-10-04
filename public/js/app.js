@@ -5,7 +5,6 @@ import { api } from './api.js?v=20260930ar';
 import * as Engine from './engine.js?v20261003bk';
 import { UI, esc, formatNum } from './ui.js?v20261003bk';
 import { Auth } from './auth.js?v=20260930ar';
-import { GM } from './gm.js?v20261003bk';
 
 import { Raid } from './raid.js?v=20260930ar';
 import { renderGuildSection, syncGuildPerks } from './guild.js?v=20261001e';
@@ -239,8 +238,6 @@ async function boot() {
     onSetSecondPet: doSetSecondPet,
     onRemoveSecondPet: doRemoveSecondPet,
     onBuyEgg: doBuyEgg,
-    onBreedPets: doBreedPets,
-    onCombinePets: doCombinePets,
     onBuyTokenItem: doBuyTokenItem,
     onChangeClassOpen: openChangeClass,
     onChangeClass: doChangeClass,
@@ -2218,50 +2215,6 @@ function doHatchPet(tier) {
   UI.combatLog(`🥚 Hatched ${sp.emoji} ${sp.name}!`, 'loot');
   if (UI.activeTab === 'pets') UI.renderPetsTab(s);
   checkAch(); // first-hatch / pack titles
-  saveNow();
-}
-
-function doBreedPets() {
-  const s = App.state;
-  if (!s) return;
-  const [a, b] = UI._breedSel || [];
-  const res = Engine.breedPets(s, a, b);
-  if (!res.ok) {
-    UI.toast(res.reason === 'gold' ? `Not enough gold — breeding costs 💰${formatNum(res.cost)}.` : 'Pick two different pets to breed.', 'warn');
-    return;
-  }
-  const sp = Engine.petSpeciesOf(res.pet);
-  UI.toast(`💕 Bred a ${sp.name}! ${sp.emoji}`, 'success');
-  UI.combatLog(`💕 Bred ${sp.emoji} ${sp.name}!`, 'loot');
-  UI.renderPetsTab(s);
-  saveNow();
-}
-
-async function doCombinePets() {
-  const s = App.state;
-  if (!s) return;
-  const uids = (UI._combineSel || []).slice();
-  const p = Engine.ensurePets(s);
-  const picks = uids.map(u => p.collection.find(x => x.uid === u)).filter(Boolean);
-  if (picks.length === 3) {
-    const names = picks.map(x => `${Engine.petSpeciesOf(x).emoji} ${Engine.petSpeciesOf(x).name} Lv ${x.level}`).join('<br>');
-    const ok = await UI.confirm(
-      '🔀 Combine pets?',
-      `<p>Permanently sacrifice these three pets to create one pet of the next rarity up?</p><p>${names}</p><p class="muted">This cannot be undone.</p>`,
-      'Combine'
-    );
-    if (!ok) return;
-  }
-  const res = Engine.combinePets(s, uids);
-  if (!res.ok) {
-    const msg = { 'pick-three': 'Pick three pets to combine.', 'same-rarity': 'All three pets must share a rarity.', 'max-rarity': 'Those pets are already max rarity!', 'protected': 'Special pets cannot be combined.' }[res.reason] || 'Combine failed.';
-    UI.toast(msg, 'warn');
-    return;
-  }
-  const sp = Engine.petSpeciesOf(res.pet);
-  UI.toast(`🔀 Combined into a Lv ${res.pet.level} ${sp.name}! ${sp.emoji}`, 'success');
-  UI.combatLog(`🔀 Combined into ${sp.emoji} Lv ${res.pet.level} ${sp.name}!`, 'loot');
-  UI.renderPetsTab(s);
   saveNow();
 }
 

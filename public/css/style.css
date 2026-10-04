@@ -4157,11 +4157,6 @@ body:is(.perf, .os-reduced) .float-txt {
   55%, 100% { background-position: 0 0, 10px 15px, -20% 0; }
 }
 /* --- Breeding Den + Token Shop --- */
-.breeding-den { margin-top: 1.2rem; }
-.breed-box { background: var(--bg2); border: 1px solid var(--stone2); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.8rem; }
-.breed-slots { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-.pet-card.breed-pick { border-color: #ff8fb3; box-shadow: 0 0 12px rgba(255,143,179,.35); }
-.pet-card.combine-pick { border-color: #7df9ff; box-shadow: 0 0 12px rgba(125,249,255,.35); }
 .token-balance { font-size: 1.1rem; background: var(--bg2); border: 1px solid var(--stone2); border-radius: 999px; padding: 0.3rem 0.8rem; }
 .shop-card.owned { opacity: .75; }
 .shop-card.locked { opacity: .55; }
@@ -5256,8 +5251,6 @@ body.reduce-motion .gpad-toast { transition: none; }
 .pet-slot.rarity-celestial, .pet-slot-frame.rarity-celestial { border-color: #7df9ff; box-shadow: 0 0 12px rgba(125, 249, 255, 0.3); }
 
 /* breed / combine pick highlight */
-.pet-slot.breed-pick { border-color: #ff8fb3; box-shadow: 0 0 12px rgba(255, 143, 179, 0.35); }
-.pet-slot.combine-pick { border-color: #7df9ff; box-shadow: 0 0 12px rgba(125, 249, 255, 0.35); }
 
 /* cohesive icon with emoji fallback */
 .pet-icon { position: relative; display: inline-block; width: 52px; height: 52px; flex: none; }
