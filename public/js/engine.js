@@ -61,6 +61,8 @@ export function createHero(name, classId) {
     stage: 1,
     gear: { weapon: null, armor: null, trinket: null },
     inventory: [],
+    materials: {},
+    completedQuests: [],
   };
   // Hunter starts with 1 pet — simple companion, no complex system
   if (classId === 'hunter') {
@@ -195,6 +197,79 @@ export function awardXp(hero, amount) {
     gained++;
   }
   return gained;
+}
+
+// Loot materials — for quests and crafting
+export const MATERIALS = {
+  fang: { emoji: '🦷', name: 'Sharp Fang', desc: 'Dropped by beasts' },
+  claw: { emoji: '🐾', name: 'Beast Claw', desc: 'Dropped by beasts' },
+  bone: { emoji: '🦴', name: 'Bone Fragment', desc: 'Dropped by undead' },
+  ectoplasm: { emoji: '👻', name: 'Ectoplasm', desc: 'Dropped by spirits' },
+  scale: { emoji: '🐉', name: 'Dragon Scale', desc: 'Dropped by dragons' },
+  ore: { emoji: '⛏️', name: 'Iron Ore', desc: 'Dropped by golems' },
+};
+
+// Roll material drop
+export function rollMaterialDrop(enemy) {
+  if (Math.random() > 0.3) return null; // 30% chance
+  const pools = {
+    '🐺': ['fang', 'claw'], '🐗': ['fang', 'claw'], '🕷️': ['claw'],
+    '🧟': ['bone'], '👺': ['bone', 'claw'], '👹': ['claw', 'fang'],
+    '🐉': ['scale'], '🤖': ['ore'], '🧛': ['ectoplasm'], '👿': ['ectoplasm', 'claw'],
+  };
+  const pool = pools[enemy.emoji] || ['bone', 'fang'];
+  const matId = pool[Math.floor(Math.random() * pool.length)];
+  return { id: matId, ...MATERIALS[matId], qty: 1 };
+}
+
+// --- Quests ---
+export const QUESTS = [
+  {
+    id: 'q1', name: 'Wolf Hunter', emoji: '🐺',
+    desc: 'Collect 5 Sharp Fangs from beasts',
+    need: { fang: 5 }, reward: { gold: 100, xp: 50 },
+  },
+  {
+    id: 'q2', name: 'Bone Collector', emoji: '🦴',
+    desc: 'Collect 8 Bone Fragments from undead',
+    need: { bone: 8 }, reward: { gold: 200, xp: 120 },
+  },
+  {
+    id: 'q3', name: 'Spider Bane', emoji: '🕷️',
+    desc: 'Collect 6 Beast Claws', need: { claw: 6 },
+    reward: { gold: 350, xp: 200 },
+  },
+  {
+    id: 'q4', name: 'Dragon Slayer', emoji: '🐉',
+    desc: 'Collect 3 Dragon Scales (bosses only)',
+    need: { scale: 3 }, reward: { gold: 1000, xp: 500 },
+  },
+];
+
+// Check quest progress
+export function questProgress(hero, quest) {
+  const mats = hero.materials || {};
+  let done = true;
+  for (const [mid, need] of Object.entries(quest.need)) {
+    if ((mats[mid] || 0) < need) done = false;
+  }
+  return done;
+}
+
+// Turn in quest
+export function turnInQuest(hero, questId) {
+  const quest = QUESTS.find(q => q.id === questId);
+  if (!quest || (hero.completedQuests || []).includes(questId)) return null;
+  if (!questProgress(hero, quest)) return null;
+  // Remove materials
+  for (const [mid, need] of Object.entries(quest.need)) {
+    hero.materials[mid] -= need;
+  }
+  hero.gold += quest.reward.gold;
+  const levels = awardXp(hero, quest.reward.xp);
+  hero.completedQuests = hero.completedQuests || [];
+  hero.completedQuests.push(questId);
+  return { quest, levels };
 }
 
 // Maybe drop gear — returns gear item or null

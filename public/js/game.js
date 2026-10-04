@@ -336,6 +336,12 @@ function onKill() {
       toast(`🎁 Found ${drop.name}`);
     }
   }
+  // Material drop (for quests)
+  const mat = Engine.rollMaterialDrop(enemy);
+  if (mat) {
+    hero.materials[mat.id] = (hero.materials[mat.id] || 0) + mat.qty;
+    // Don't spam toast for materials, just update quest tab silently
+  }
 
   if (levels > 0) {
     heroHp = Engine.heroStats(hero).hp; // Full heal on level up
@@ -679,6 +685,54 @@ function renderDungeons() {
   });
 }
 
+// --- Quests ---
+function renderQuests() {
+  const ql = $('quest-list');
+  ql.innerHTML = '';
+  for (const q of Engine.QUESTS) {
+    const done = (hero.completedQuests || []).includes(q.id);
+    const progress = Engine.questProgress(hero, q);
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    let needText = Object.entries(q.need).map(([mid, n]) => {
+      const have = (hero.materials || {})[mid] || 0;
+      const mat = Engine.MATERIALS[mid];
+      return `${mat.emoji} ${have}/${n}`;
+    }).join(' ');
+    div.innerHTML = `<div><div class="g-name">${q.emoji} ${q.name} ${done ? '✅' : ''}</div>
+      <div class="g-stats">${q.desc}<br>${needText}<br>Reward: ${q.reward.gold}g + ${q.reward.xp}xp</div></div>
+      ${!done && progress ? `<button class="btn small gold" data-quest="${q.id}">Turn In</button>` : ''}`;
+    ql.appendChild(div);
+  }
+  ql.querySelectorAll('[data-quest]').forEach(btn => {
+    btn.onclick = () => {
+      const r = Engine.turnInQuest(hero, btn.dataset.quest);
+      if (r) {
+        saveHero();
+        renderQuests();
+        updateHUD();
+        toast(`📜 Quest complete! +${r.quest.reward.gold}g +${r.quest.reward.xp}xp${r.levels ? ` (Lv up!)` : ''}`);
+      }
+    };
+  });
+
+  // Materials
+  const ml = $('material-list');
+  ml.innerHTML = '';
+  const mats = hero.materials || {};
+  const hasMats = Object.keys(mats).some(k => mats[k] > 0);
+  if (!hasMats) ml.innerHTML = '<p style="color:#666">No materials yet. Defeat enemies!</p>';
+  for (const [mid, qty] of Object.entries(mats)) {
+    if (qty <= 0) continue;
+    const mat = Engine.MATERIALS[mid];
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-name">${mat.emoji} ${mat.name} ×${qty}</div>
+      <div class="g-stats">${mat.desc}</div></div>`;
+    ml.appendChild(div);
+  }
+}
+
 // --- Tabs ---
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.onclick = () => {
@@ -688,6 +742,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     $('tab-' + btn.dataset.tab).classList.remove('hidden');
     if (btn.dataset.tab === 'party') renderParty();
     if (btn.dataset.tab === 'dungeon') renderDungeons();
+    if (btn.dataset.tab === 'quests') renderQuests();
     if (btn.dataset.tab !== 'battle') updateHUD();
   };
 });
