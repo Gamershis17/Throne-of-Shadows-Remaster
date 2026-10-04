@@ -65,6 +65,7 @@
     <button class="tab-btn" data-tab="quests">📜<span>Quests</span></button>
     <button class="tab-btn" data-tab="auction">🏪<span>Auction</span></button>
     <button class="tab-btn" data-tab="mail">📬<span>Mail</span></button>
+    <button class="tab-btn" data-tab="chat">💬<span>Chat</span></button>
     <button class="tab-btn" data-tab="character">👤<span>Hero</span></button>
     <button class="tab-btn" data-tab="gear">🎒<span>Gear</span></button>
     <button class="tab-btn" data-tab="settings">⚙️<span>Settings</span></button>
@@ -90,6 +91,15 @@
     <div id="party-list" class="gear-list"></div>
     <h3>🍺 Recruit Companions</h3>
     <div id="recruit-list" class="gear-list"></div>
+  </section>
+
+  <section id="tab-chat" class="tab hidden">
+    <h2>💬 World Chat</h2>
+    <div id="chat-messages" class="chat-box"></div>
+    <div class="chat-input-row">
+      <input id="chat-input" placeholder="Say something..." maxlength="200" autocomplete="off">
+      <button id="chat-send" class="btn gold">Send</button>
+    </div>
   </section>
 
   <section id="tab-mail" class="tab hidden">

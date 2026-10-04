@@ -479,3 +479,50 @@ body {
   background: #8b5cf6;
   transition: width 0.3s;
 }
+
+/* --- Chat --- */
+.chat-box {
+  height: 300px;
+  overflow-y: auto;
+  background: #141020;
+  border: 1px solid #2a2440;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-msg {
+  font-size: 13px;
+  word-wrap: break-word;
+}
+
+.chat-msg .c-name {
+  font-weight: bold;
+  color: #a78bfa;
+}
+
+.chat-msg .c-name.gm {
+  color: #ffd23f;
+}
+
+.chat-msg .c-text {
+  color: #e8e0d0;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 12px;
+  background: #141020;
+  border: 1px solid #2a2440;
+  border-radius: 8px;
+  color: #e8e0d0;
+  font-size: 14px;
+}

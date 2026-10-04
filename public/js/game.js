@@ -834,6 +834,50 @@ function renderMail() {
   });
 }
 
+// --- Chat ---
+let chatTimer = null;
+
+async function loadChat() {
+  try {
+    const r = await fetch('/api/chat');
+    const d = await r.json();
+    if (!d.ok) return;
+    const box = $('chat-messages');
+    box.innerHTML = '';
+    for (const m of d.messages) {
+      const div = document.createElement('div');
+      div.className = 'chat-msg';
+      div.innerHTML = `<span class="c-name ${m.isGM ? 'gm' : ''}">${escapeHtml(m.display)}</span>: <span class="c-text">${escapeHtml(m.text)}</span>`;
+      box.appendChild(div);
+    }
+    box.scrollTop = box.scrollHeight;
+  } catch {}
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function sendChat() {
+  const input = $('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    loadChat();
+  } catch {}
+}
+
+$('chat-send').onclick = sendChat;
+$('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendChat();
+});
+
 // --- Tabs ---
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.onclick = () => {
@@ -846,6 +890,13 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'quests') renderQuests();
     if (btn.dataset.tab === 'auction') renderAuction();
     if (btn.dataset.tab === 'mail') renderMail();
+    if (btn.dataset.tab === 'chat') {
+      loadChat();
+      clearInterval(chatTimer);
+      chatTimer = setInterval(loadChat, 3000);
+    } else {
+      clearInterval(chatTimer);
+    }
     if (btn.dataset.tab !== 'battle') updateHUD();
   };
 });

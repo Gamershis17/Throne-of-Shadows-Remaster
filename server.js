@@ -21,6 +21,36 @@ app.get('/api/status', (req, res) => {
   res.json({ ok: true, game: 'Throne of Shadows Remaster', version: '2.0.0' });
 });
 
+// --- Chat ---
+const chatMessages = [];
+const MAX_CHAT = 50;
+
+// GM list (usernames)
+const GMS = (process.env.GM_USERS || 'Gamershis17').split(',');
+
+app.get('/api/chat', (req, res) => {
+  res.json({ ok: true, messages: chatMessages.slice(-20) });
+});
+
+app.post('/api/chat', (req, res) => {
+  const { text } = req.body || {};
+  if (!text || text.length > 200) return res.json({ ok: false });
+  const guest = req.session.guest;
+  const name = guest ? guest.name : 'Guest';
+  const isGM = GMS.includes(name);
+  const msg = {
+    id: Date.now(),
+    name,
+    display: isGM ? `<GM> ${name}` : name,
+    isGM,
+    text: text.slice(0, 200),
+    at: Date.now(),
+  };
+  chatMessages.push(msg);
+  if (chatMessages.length > MAX_CHAT) chatMessages.shift();
+  res.json({ ok: true, message: msg });
+});
+
 // Guest session — immediate play, no account needed
 app.post('/api/guest', (req, res) => {
   const { name, classId } = req.body || {};
