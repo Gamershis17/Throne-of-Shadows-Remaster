@@ -10,6 +10,7 @@ let hero = null;
 let enemy = null;
 let heroHp = 0;
 let heroMana = 0;
+let party = null;
 let selectedClass = 'warrior';
 let autoTimer = null;
 let manaTimer = null;
@@ -41,6 +42,7 @@ $('start-btn').onclick = async () => {
   const st = Engine.heroStats(hero);
   heroHp = st.hp;
   heroMana = st.mana;
+  party = Engine.createParty(selectedClass);
 
   // Save to server session
   try {
@@ -398,7 +400,89 @@ function toast(msg) {
 }
 
 function saveHero() {
+  hero.party = party;
   localStorage.setItem('tos-hero', JSON.stringify(hero));
+}
+
+// --- Party ---
+function renderParty() {
+  const counts = { tank: 0, healer: 0, dps: 0 };
+  for (const m of party.members) counts[m.role]++;
+
+  $('party-count').textContent = `(${party.members.length}/5)`;
+
+  const pl = $('party-list');
+  pl.innerHTML = '';
+  for (const m of party.members) {
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    const role = Engine.ROLES[m.role];
+    if (m.isPlayer) {
+      const cls = Engine.CLASSES[hero.classId];
+      div.innerHTML = `<div><div class="g-name">${cls.emoji} ${hero.name} (You)</div>
+        <div class="g-stats">${role.emoji} ${role.name} · Lv ${hero.level}</div></div>`;
+    } else {
+      div.innerHTML = `<div><div class="g-name">${m.emoji} ${m.name}</div>
+        <div class="g-stats">${role.emoji} ${role.name} · ${m.hp}/${m.maxHp} HP</div></div>
+        <button class="btn small" data-dismiss="${m.id}">Dismiss</button>`;
+    }
+    pl.appendChild(div);
+  }
+  pl.querySelectorAll('[data-dismiss]').forEach(btn => {
+    btn.onclick = () => {
+      party.members = party.members.filter(m => m.id !== btn.dataset.dismiss);
+      saveHero();
+      renderParty();
+      renderDungeons();
+    };
+  });
+
+  // Recruit list
+  const rl = $('recruit-list');
+  rl.innerHTML = '';
+  for (const comp of Engine.COMPANIONS) {
+    if (party.members.some(m => m.id === comp.id)) continue;
+    const role = Engine.ROLES[comp.role];
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-name">${comp.emoji} ${comp.name}</div>
+      <div class="g-stats">${role.emoji} ${role.name} · ${comp.desc} · ${comp.cost}g</div></div>
+      <button class="btn small gold" data-hire="${comp.id}">Hire</button>`;
+    rl.appendChild(div);
+  }
+  rl.querySelectorAll('[data-hire]').forEach(btn => {
+    btn.onclick = () => {
+      const r = Engine.hireCompanion(hero, party, btn.dataset.hire);
+      if (!r.ok) {
+        toast(r.reason === 'gold' ? 'Not enough gold!' : r.reason === 'full' ? 'Party full!' : 'Cannot hire');
+        return;
+      }
+      saveHero();
+      renderParty();
+      renderDungeons();
+      updateHUD();
+      toast(`🎉 ${r.companion.emoji} ${r.companion.name} joined!`);
+    };
+  });
+}
+
+// --- Dungeons ---
+function renderDungeons() {
+  const dl = $('dungeon-list');
+  dl.innerHTML = '';
+  const valid = Engine.validateParty(party);
+  for (const d of Engine.DUNGEONS) {
+    const unlocked = hero.stage >= d.unlockStage;
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-name">${d.emoji} ${d.name}</div>
+      <div class="g-stats">${d.waves} waves · Unlocks at stage ${d.unlockStage} · ${d.desc}</div></div>
+      <button class="btn small ${unlocked && valid ? 'gold' : ''}" ${!unlocked || !valid ? 'disabled' : ''} data-dungeon="${d.id}">
+        ${!unlocked ? `🔒 Stage ${d.unlockStage}` : !valid ? 'Need 5-man' : 'Enter'}
+      </button>`;
+    dl.appendChild(div);
+  }
+  // TODO: dungeon run logic
 }
 
 // --- Tabs ---
@@ -408,6 +492,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
     btn.classList.add('active');
     $('tab-' + btn.dataset.tab).classList.remove('hidden');
+    if (btn.dataset.tab === 'party') renderParty();
+    if (btn.dataset.tab === 'dungeon') renderDungeons();
     if (btn.dataset.tab !== 'battle') updateHUD();
   };
 });
@@ -427,6 +513,12 @@ try {
   if (saved) {
     hero = JSON.parse(saved);
     heroHp = Engine.heroStats(hero).hp;
+    heroMana = Engine.heroStats(hero).mana;
+    party = hero.party || Engine.createParty(hero.classId);
+    // Restore companion HP
+    for (const m of party.members) {
+      if (!m.isPlayer && m.maxHp) m.hp = m.maxHp;
+    }
     $('view-class').classList.add('hidden');
     $('view-game').classList.remove('hidden');
     startBattle();

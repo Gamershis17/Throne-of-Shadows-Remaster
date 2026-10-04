@@ -60,6 +60,8 @@
 
   <nav class="tabbar">
     <button class="tab-btn active" data-tab="battle">⚔️<span>Battle</span></button>
+    <button class="tab-btn" data-tab="party">👥<span>Party</span></button>
+    <button class="tab-btn" data-tab="dungeon">🗺️<span>Dungeon</span></button>
     <button class="tab-btn" data-tab="character">👤<span>Hero</span></button>
     <button class="tab-btn" data-tab="gear">🎒<span>Gear</span></button>
     <button class="tab-btn" data-tab="settings">⚙️<span>Settings</span></button>
@@ -77,6 +79,20 @@
   <section id="tab-gear" class="tab hidden">
     <h2>🎒 Inventory</h2>
     <div id="inventory-list" class="gear-list"></div>
+  </section>
+
+  <section id="tab-party" class="tab hidden">
+    <h2>👥 Party <span id="party-count" class="muted"></span></h2>
+    <p class="muted small">5-man: 1 Tank 🛡️ · 1 Healer 💚 · 3 DPS ⚔️</p>
+    <div id="party-list" class="gear-list"></div>
+    <h3>🍺 Recruit Companions</h3>
+    <div id="recruit-list" class="gear-list"></div>
+  </section>
+
+  <section id="tab-dungeon" class="tab hidden">
+    <h2>🗺️ Dungeons</h2>
+    <p class="muted small">Requires full 5-man party</p>
+    <div id="dungeon-list" class="gear-list"></div>
   </section>
 
   <section id="tab-settings" class="tab hidden">

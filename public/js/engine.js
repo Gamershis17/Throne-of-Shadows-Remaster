@@ -268,6 +268,56 @@ export const DUNGEONS = [
   { id: 'abyss', name: 'Void Abyss', emoji: '🕳️', waves: 12, unlockStage: 50, desc: 'The darkness stares back.' },
 ];
 
+// Party roles
+export const ROLES = {
+  tank: { emoji: '🛡️', name: 'Tank' },
+  healer: { emoji: '💚', name: 'Healer' },
+  dps: { emoji: '⚔️', name: 'DPS' },
+};
+
+// NPC companions for hire
+export const COMPANIONS = [
+  { id: 'bromm', name: 'Bromm', emoji: '🧔', role: 'tank', desc: 'Sturdy dwarf, takes hits', hp: 200, atk: 10, def: 15, cost: 500 },
+  { id: 'sylvara', name: 'Sylvara', emoji: '🧝', role: 'healer', desc: 'Elven healer, mends wounds', hp: 100, atk: 5, def: 5, heal: 30, cost: 500 },
+  { id: 'karg', name: 'Karg', emoji: '👹', role: 'dps', desc: 'Orc berserker', hp: 120, atk: 25, def: 5, cost: 300 },
+  { id: 'lyra', name: 'Lyra', emoji: '🧙', role: 'dps', desc: 'Human mage', hp: 80, atk: 30, def: 3, cost: 300 },
+  { id: 'finn', name: 'Finn', emoji: '🥷', role: 'dps', desc: 'Halfling rogue', hp: 90, atk: 28, def: 4, cost: 300 },
+];
+
+// Create empty party — player fills 1 slot, recruit 4 NPCs
+export function createParty(playerClass) {
+  const roleMap = { warrior: 'tank', mage: 'dps', hunter: 'dps' };
+  return {
+    members: [
+      { id: 'player', role: roleMap[playerClass] || 'dps', isPlayer: true },
+    ],
+    // Need: 1 tank, 1 healer, 3 dps total (player fills one)
+  };
+}
+
+// Check if party is full and valid (1 tank, 1 healer, 3 dps)
+export function validateParty(party) {
+  const counts = { tank: 0, healer: 0, dps: 0 };
+  for (const m of party.members) counts[m.role]++;
+  return counts.tank === 1 && counts.healer === 1 && counts.dps === 3;
+}
+
+// Hire a companion
+export function hireCompanion(hero, party, companionId) {
+  const comp = COMPANIONS.find(c => c.id === companionId);
+  if (!comp) return { ok: false };
+  if (party.members.length >= 5) return { ok: false, reason: 'full' };
+  if (party.members.some(m => m.id === companionId)) return { ok: false, reason: 'have' };
+  if (hero.gold < comp.cost) return { ok: false, reason: 'gold' };
+  // Check role not already filled (except DPS which needs 3)
+  const roleCount = party.members.filter(m => m.role === comp.role).length;
+  const maxForRole = comp.role === 'dps' ? 3 : 1;
+  if (roleCount >= maxForRole) return { ok: false, reason: 'role' };
+  hero.gold -= comp.cost;
+  party.members.push({ ...comp, hp: comp.hp, maxHp: comp.hp });
+  return { ok: true, companion: comp };
+}
+
 // Compare gear — returns true if new item is better for its slot
 export function isUpgrade(hero, item) {
   const current = hero.gear[item.slot];
