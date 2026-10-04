@@ -265,7 +265,7 @@ export const UI = {
 
     // Swipe gestures for mobile tab navigation
     (() => {
-      const tabOrder = ['battle', 'mine', 'gear', 'armory', 'tokenshop', 'pets', 'party', 'ranks', 'guild', 'quests', 'talents', 'stats', 'titles', 'settings'];
+      const tabOrder = ['battle', 'mine', 'gear', 'armory', 'pets', 'party', 'ranks', 'guild', 'quests', 'talents', 'stats'];
       let touchStartX = 0;
       let touchStartY = 0;
       let touchStartTime = 0;

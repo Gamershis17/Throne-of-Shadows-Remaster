@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
   <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004b">
+  <link rel="stylesheet" href="css/style.css?v20261004c">
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -388,157 +388,6 @@
       </section>
 
       <!-- MORE -->
-      <section id="tab-settings" class="tab">
-        <div class="card" id="account-card">
-          <h3>👤 Account</h3>
-          <p class="muted small" id="account-current"></p>
-          <div id="acct-forms">
-            <div class="acct-section">
-              <h4>🔑 Change password</h4>
-              <input type="password" id="acct-cur-pass" class="friend-input acct-input" placeholder="Current password" autocomplete="current-password">
-              <input type="password" id="acct-new-pass" class="friend-input acct-input" placeholder="New password (min 8 chars)" autocomplete="new-password">
-              <input type="password" id="acct-new-pass2" class="friend-input acct-input" placeholder="Confirm new password" autocomplete="new-password">
-              <button id="acct-pass-btn" class="btn gold wide">Change password</button>
-            </div>
-            <div class="acct-section">
-              <h4>✏️ Change username</h4>
-              <input id="acct-new-username" class="friend-input acct-input" placeholder="New username (3–20: A–Z, 0–9, _)" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false">
-              <input type="password" id="acct-username-pass" class="friend-input acct-input" placeholder="Current password to confirm" autocomplete="current-password">
-              <button id="acct-username-btn" class="btn gold wide">Change username</button>
-              <p class="muted tiny">Renames you everywhere — guild, friends, leaderboard. Progress, items, and hero name are untouched.</p>
-            </div>
-          </div>
-          <button id="logout-btn" class="btn danger wide">Logout</button>
-        </div>
-        <div id="profile-card" class="card"></div>
-        <div class="card hidden" id="guest-upgrade-card">
-          <h3>💾 Keep your progress</h3>
-          <p class="muted small">You're playing as a guest — your hero only exists on this device. Create a free account to save online, join guilds, and appear on the leaderboard.</p>
-          <button id="guest-upgrade-btn" class="btn gold wide">✨ Create account</button>
-        </div>
-        <div class="card">
-          <h3>📣 Share the game</h3>
-          <p class="muted small">Brag your stats, invite friends, or grab the link for your videos.</p>
-          <button id="share-btn" class="btn gold wide">📣 Share Throne of Shadows</button>
-        </div>
-        <div class="card">
-          <h3>📜 Game logs</h3>
-          <div class="row">
-            <button id="changelog-btn" class="btn wide">📰 What's New <span id="changelog-badge" class="new-badge hidden">NEW</span></button>
-            <button id="balance-log-btn" class="btn wide">⚖️ Balance Log <span id="balance-log-badge" class="new-badge hidden">NEW</span></button>
-          </div>
-        </div>
-        <div class="card">
-          <h3>🎁 Redeem gift code</h3>
-          <div class="row">
-            <input id="redeem-input" placeholder="XXXX-XXXX-XXXX" autocomplete="off"
-                   autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
-            <button id="redeem-btn" class="btn">Redeem</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3>⚙️ Settings</h3>
-          <label class="setting"><input type="checkbox" id="set-dmgnums"> Damage numbers</label>
-          <label class="setting"><input type="checkbox" id="set-motion"> Reduce motion</label>
-          <label class="setting"><input type="checkbox" id="set-sfx"> Sound FX</label>
-          <label class="setting"><input type="checkbox" id="set-music"> Music <span class="muted small">(ambient)</span></label>
-          <label class="setting"><input type="checkbox" id="set-perf"> Performance mode <span class="muted small">(anti-lag)</span></label>
-          <div class="setting-row">
-            <span class="setting-label">🎬 Background frame rate</span>
-            <div class="seg-control" id="bg-fps-seg" role="group" aria-label="Background frame rate">
-              <button type="button" data-bgfps="30">30 FPS</button>
-              <button type="button" data-bgfps="60">60 FPS</button>
-            </div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">🖼️ Background detail</span>
-            <div class="seg-control" id="bg-hd-seg" role="group" aria-label="Background detail">
-              <button type="button" data-bghd="0">SD</button>
-              <button type="button" data-bghd="1">HD</button>
-            </div>
-          </div>
-          <div class="setting-row" id="music-track-row">
-            <span class="setting-label">🎼 Music track</span>
-            <select id="set-music-track" class="country-select" aria-label="Music track"></select>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">🎚️ Music volume</span>
-            <input type="range" id="set-music-vol" min="0" max="100" value="50" aria-label="Music volume">
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">🎚️ SFX volume</span>
-            <input type="range" id="set-sfx-vol" min="0" max="100" value="50" aria-label="SFX volume">
-          </div>
-          <label class="setting"><input type="checkbox" id="set-combat-music" checked> Boss-fight music <span class="muted small">(Dread Sovereign)</span></label>
-          <label class="setting"><input type="checkbox" id="set-follow-world" checked> Worlds change the music <span class="muted small">(Void Hymn in deep worlds)</span></label>
-          <div class="setting-row" style="margin-top:0.55rem">
-            <span class="setting-label">🔔 Notifications</span>
-          </div>
-          <label class="setting"><input type="checkbox" id="set-notif-level" checked> Level-up toasts</label>
-          <label class="setting"><input type="checkbox" id="set-notif-death" checked> Death toasts</label>
-          <label class="setting"><input type="checkbox" id="set-notif-loot" checked> Loot-drop toasts</label>
-          <label class="setting"><input type="checkbox" id="set-notif-quest" checked> Quest-complete toasts</label>
-          <div class="setting-row">
-            <span class="setting-label">UI style</span>
-            <div class="seg-control" id="ui-style-seg" role="group" aria-label="UI style">
-              <button type="button" data-uistyle="classic">Classic</button>
-              <button type="button" data-uistyle="modern">Modern</button>
-            </div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">Buttons</span>
-            <div class="swatch-grid" id="btn-style-picker" role="group" aria-label="Button style"></div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">Background</span>
-            <div class="swatch-grid" id="bg-style-picker" role="group" aria-label="Background style"></div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">⚔️ Battle background</span>
-            <div class="opt-cards" id="battle-bg-picker" role="radiogroup" aria-label="Battle background"></div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">✨ Name style</span>
-            <div class="swatch-grid" id="name-color-picker" role="group" aria-label="Name color"></div>
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">Custom color</span>
-            <input type="color" id="name-color-custom" class="color-input" value="#ffd76a" aria-label="Custom name color">
-          </div>
-          <div class="setting-row">
-            <span class="setting-label">Name effect</span>
-            <div class="fx-grid" id="name-fx-picker" role="group" aria-label="Name effect"></div>
-          </div>
-          <div class="setting-row hidden" id="bg-anim-row">
-            <span class="setting-label" id="bg-anim-label">Scene options</span>
-            <div id="bg-anim-opts"></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>🌍 Immersion</h3>
-          <div class="setting-row">
-            <span class="setting-label">🌦️ Atmosphere</span>
-            <select id="set-atmosphere" class="country-select" aria-label="Atmosphere">
-              <option value="clear">Clear skies</option>
-              <option value="rain">Rain</option>
-              <option value="fog">Fog</option>
-              <option value="ash">Drifting ash</option>
-            </select>
-          </div>
-          <label class="setting"><input type="checkbox" id="set-weathersync"> Sync real weather <span class="muted small">(uses your location)</span></label>
-          <div class="setting-row">
-            <span class="setting-label">🎨 Graphics quality</span>
-            <div class="seg-control" id="gfx-seg" role="group" aria-label="Graphics quality">
-              <button type="button" data-gfx="sd">SD</button>
-              <button type="button" data-gfx="hd">HD</button>
-              <button type="button" data-gfx="4k">4K</button>
-            </div>
-          </div>
-          <p class="muted small">Night palette and seasonal tints follow your device clock automatically.</p>
-        </div>
-        <a href="/report.html" class="btn wide" style="margin-bottom:0.5rem">🐞 Report a bug / 💬 Feedback</a>
-        <a href="https://discord.gg/qVPkJbEDzu" target="_blank" rel="noopener" class="btn wide" style="margin-bottom:0.5rem">💬 Feedback on Discord</a>
-      </section>
     </main>
 
     <nav id="tabbar">
@@ -555,7 +404,6 @@
       <button class="tab-btn" data-tab="quests"><span class="ticon">📜</span><span>Quests</span></button>
       <button class="tab-btn" data-tab="talents"><span class="ticon">🌳</span><span>Talents</span></button>
       <button class="tab-btn" data-tab="stats"><span class="ticon">📊</span><span>Stats</span></button>
-      <button class="tab-btn" data-tab="settings"><span class="ticon">⚙️</span><span>Settings</span></button>
       <button class="tab-btn" id="realm-open"><span class="ticon">🌐</span><span>Realm</span></button>
       <button class="tab-btn hidden" data-tab="staff" id="tabbtn-staff"><span class="ticon">🛠️</span><span>Staff</span></button>
     </nav>
@@ -569,7 +417,7 @@
 <div id="gm-rainbow-frame"></div>
 <div id="toast-root"></div>
 
-<script type="module" src="js/app.js?v20261004b"></script>
+<script type="module" src="js/app.js?v20261004c"></script>
 <script type="module" src="js/gamepad.js?v=20260930ar"></script>
 </body>
 </html>
