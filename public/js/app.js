@@ -2,15 +2,15 @@
 // app.js — boot, session flow, game loops, combat wiring.
 // ============================================================
 import { api } from './api.js?v=20260930ar';
-import * as Engine from './engine.js?v20261004a';
-import { UI, esc, formatNum } from './ui.js?v20261004a';
+import * as Engine from './engine.js?v20261004b';
+import { UI, esc, formatNum } from './ui.js?v20261004b';
 import { Auth } from './auth.js?v=20260930ar';
 
 import { Raid } from './raid.js?v=20260930ar';
 import { renderGuildSection, syncGuildPerks } from './guild.js?v=20261001e';
 import { loadGuest, saveGuest, clearGuest, GUEST_ROLE } from './guest.js?v=20260930ar';
-import { Realm } from './realm.js?v20261004a';
-import { Audio } from './audio.js?v20261004a';
+import { Realm } from './realm.js?v20261004b';
+import { Audio } from './audio.js?v20261004b';
 
 const TICK_MS = 250;
 const AUTOSAVE_MS = 15000;
@@ -417,6 +417,41 @@ async function boot() {
 // The auth screen: login/register tabs plus the guest entry point.
 function showAuthView() {
   UI.showView('auth');
+  // REMASTER: mockup-style path selection
+  const pathSelect = document.getElementById('path-select');
+  const authForms = document.getElementById('auth-forms');
+  const guestBtn = document.getElementById('path-guest-btn');
+  const accountBtn = document.getElementById('path-account-btn');
+  const backBtn = document.getElementById('auth-back-btn');
+  if (pathSelect && authForms) {
+    pathSelect.classList.remove('hidden');
+    authForms.classList.add('hidden');
+  }
+  if (guestBtn && !guestBtn._bound) {
+    guestBtn._bound = true;
+    guestBtn.addEventListener('click', () => {
+      // Go straight to guest flow
+      if (pathSelect) pathSelect.classList.add('hidden');
+      if (authForms) authForms.classList.remove('hidden');
+      // Trigger guest section
+      const guestStart = document.getElementById('guest-start');
+      if (guestStart) guestStart.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+  if (accountBtn && !accountBtn._bound) {
+    accountBtn._bound = true;
+    accountBtn.addEventListener('click', () => {
+      if (pathSelect) pathSelect.classList.add('hidden');
+      if (authForms) authForms.classList.remove('hidden');
+    });
+  }
+  if (backBtn && !backBtn._bound) {
+    backBtn._bound = true;
+    backBtn.addEventListener('click', () => {
+      if (pathSelect) pathSelect.classList.remove('hidden');
+      if (authForms) authForms.classList.add('hidden');
+    });
+  }
   // REMASTER: start the login overture (calm -> epic build)
   try {
     if (typeof Audio !== 'undefined' && Audio.startLoginMusic) {

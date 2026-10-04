@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
   <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004a">
+  <link rel="stylesheet" href="css/style.css?v20261004b">
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -27,40 +27,58 @@
     <div class="remaster-stars" aria-hidden="true"></div>
     <div class="remaster-embers" aria-hidden="true"></div>
     <div class="remaster-vignette" aria-hidden="true"></div>
-    <div class="auth-wrap auth-fantasy remaster-wrap">
-      <img class="logo-img remaster-logo" src="img/remaster-logo.webp" alt="Throne of Shadows Remaster logo">
-      <h1 class="game-title">THRONE OF SHADOWS</h1>
-      <div class="remaster-badge">✦ REMASTER ✦</div>
-      <p class="tagline">Tap. Loot. Raid. No rebirth.</p>
-      <div class="auth-card">
-        <div class="auth-tabs">
-          <button id="auth-tab-login" class="auth-tab active" type="button">Login</button>
-          <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
-        </div>
-        <form id="login-form" class="auth-form" autocomplete="on">
-          <input id="login-username" placeholder="Username" autocomplete="username" maxlength="20">
-          <input id="login-password" type="password" placeholder="Password" autocomplete="current-password">
-          <button type="submit" class="btn gold">Login</button>
-        </form>
-        <form id="register-form" class="auth-form hidden" autocomplete="on">
-          <input id="reg-username" placeholder="Username (3–20, letters/numbers/_)" autocomplete="username" maxlength="20">
-          <input id="reg-password" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
-          <input id="reg-password2" type="password" placeholder="Confirm password" autocomplete="new-password">
-          <button type="submit" class="btn gold">Create hero</button>
-          <p class="muted small" style="text-align:center;margin-top:8px;"><span class="cap-note">👑 Account level cap: 60</span></p>
-        </form>
-        <div id="auth-error" class="auth-error hidden"></div>
-        <div class="guest-block">
-          <div class="guest-divider"><span>or</span></div>
-          <div id="guest-continue" class="hidden">
-            <p class="muted small">Guest adventure found: <b id="guest-continue-name" class="gold-text"></b></p>
-            <button id="guest-continue-btn" class="btn wide" type="button">Continue as guest</button>
-            <button id="guest-fresh-btn" class="btn ghost small" type="button">start over instead</button>
+    <div class="remaster-fireglow" aria-hidden="true"></div>
+    <div class="auth-wrap remaster-wrap mockup-style">
+      <div class="mockup-title-block">
+        <div class="mockup-ornament">◆</div>
+        <h1 class="mockup-title">THRONE OF<br>SHADOWS</h1>
+        <div class="mockup-subtitle">REMASTER</div>
+      </div>
+      <div id="path-select">
+        <div class="mockup-choose">CHOOSE YOUR PATH</div>
+        <button id="path-guest-btn" class="mockup-path-btn guest-path" type="button">
+          <span class="path-title">PLAY AS GUEST</span>
+          <span class="path-sub">Begin instantly · Level 20 cap</span>
+          <span class="path-arrow">›</span>
+        </button>
+        <button id="path-account-btn" class="mockup-path-btn account-path" type="button">
+          <span class="path-title">LOGIN / CREATE ACCOUNT</span>
+          <span class="path-sub">Save your legend · Level 60 cap</span>
+          <span class="path-arrow">›</span>
+        </button>
+      </div>
+      <div id="auth-forms" class="hidden">
+        <button id="auth-back-btn" class="btn ghost small" type="button">← Back</button>
+        <div class="auth-card mockup-card">
+          <div class="auth-tabs">
+            <button id="auth-tab-login" class="auth-tab active" type="button">Login</button>
+            <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
           </div>
-          <div id="guest-start">
-            <input id="guest-name" placeholder="Guest name (optional)" maxlength="16" autocomplete="off">
-            <button id="guest-play-btn" class="btn wide" type="button">Play as Guest</button>
-            <p class="muted small">No account needed. Progress saves on this device only.<br><span class="cap-note">⚔️ Guest level cap: 20</span></p>
+          <form id="login-form" class="auth-form" autocomplete="on">
+            <input id="login-username" placeholder="Username" autocomplete="username" maxlength="20">
+            <input id="login-password" type="password" placeholder="Password" autocomplete="current-password">
+            <button type="submit" class="btn gold">Login</button>
+          </form>
+          <form id="register-form" class="auth-form hidden" autocomplete="on">
+            <input id="reg-username" placeholder="Username (3–20, letters/numbers/_)" autocomplete="username" maxlength="20">
+            <input id="reg-password" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+            <input id="reg-password2" type="password" placeholder="Confirm password" autocomplete="new-password">
+            <button type="submit" class="btn gold">Create hero</button>
+            <p class="muted small" style="text-align:center;margin-top:8px;"><span class="cap-note">👑 Account level cap: 60</span></p>
+          </form>
+          <div id="auth-error" class="auth-error hidden"></div>
+          <div class="guest-block">
+            <div class="guest-divider"><span>or</span></div>
+            <div id="guest-continue" class="hidden">
+              <p class="muted small">Guest adventure found: <b id="guest-continue-name" class="gold-text"></b></p>
+              <button id="guest-continue-btn" class="btn wide" type="button">Continue as guest</button>
+              <button id="guest-fresh-btn" class="btn ghost small" type="button">start over instead</button>
+            </div>
+            <div id="guest-start">
+              <input id="guest-name" placeholder="Guest name (optional)" maxlength="16" autocomplete="off">
+              <button id="guest-play-btn" class="btn wide" type="button">Play as Guest</button>
+              <p class="muted small">No account needed. Progress saves on this device only.<br><span class="cap-note">⚔️ Guest level cap: 20</span></p>
+            </div>
           </div>
         </div>
       </div>
@@ -551,7 +569,7 @@
 <div id="gm-rainbow-frame"></div>
 <div id="toast-root"></div>
 
-<script type="module" src="js/app.js?v20261004a"></script>
+<script type="module" src="js/app.js?v20261004b"></script>
 <script type="module" src="js/gamepad.js?v=20260930ar"></script>
 </body>
 </html>
