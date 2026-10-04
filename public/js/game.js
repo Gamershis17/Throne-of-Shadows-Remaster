@@ -409,7 +409,16 @@ function toast(msg) {
 function saveHero() {
   hero.party = party;
   localStorage.setItem('tos-hero', JSON.stringify(hero));
+  // Also save to server (for GM inspection)
+  fetch('/api/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ hero }),
+  }).catch(() => {});
 }
+
+// Auto-save every 30s
+setInterval(() => { if (hero) saveHero(); }, 30000);
 
 // --- Party ---
 function renderParty() {
@@ -926,6 +935,36 @@ setInterval(async () => {
 }, 5000);
 
 $('gm-announce-close').onclick = () => $('gm-announce').classList.add('hidden');
+
+// GM Player Inspector
+$('gm-inspect-btn') && ($('gm-inspect-btn').onclick = async () => {
+  const name = $('gm-inspect-input').value.trim();
+  if (!name) return;
+  try {
+    const r = await fetch(`/api/gm/inspect/${encodeURIComponent(name)}`);
+    const d = await r.json();
+    const el = $('gm-inspect-result');
+    if (!d.ok) {
+      el.innerHTML = `<p style="color:#e5484d">Player not found or no data.</p>`;
+      return;
+    }
+    const p = d.player;
+    const stats = Engine.heroStats(p);
+    el.innerHTML = `
+      <div class="gear-item"><div>
+        <div class="g-name">${p.name} (Lv ${p.level} ${Engine.CLASSES[p.classId]?.name})</div>
+        <div class="g-stats">💰 ${p.gold}g · 🗺️ Stage ${p.stage} · ⭐ ${p.xp}xp</div>
+        <div class="g-stats">❤️ ${stats.hp} HP · ⚔️ ${stats.atk} ATK · 🛡️ ${stats.def} DEF</div>
+        <div class="g-stats">🎒 ${p.inventory?.length || 0} items · 📦 ${(p.materials ? Object.values(p.materials).reduce((a,b)=>a+b,0) : 0)} materials</div>
+        <div class="g-stats" style="margin-top:8px"><b>Equipped:</b><br>
+          ${Object.entries(p.gear || {}).map(([s, i]) => `${s}: ${i ? i.name : 'empty'}`).join('<br>')}
+        </div>
+        ${p.inventory?.length ? `<div class="g-stats" style="margin-top:8px"><b>Bags:</b><br>${p.inventory.map(i => i.name).join('<br>')}</div>` : ''}
+      </div></div>`;
+  } catch {
+    $('gm-inspect-result').innerHTML = '<p style="color:#e5484d">Error loading player.</p>';
+  }
+});
 
 // GM broadcast
 $('gm-broadcast-btn') && ($('gm-broadcast-btn').onclick = async () => {

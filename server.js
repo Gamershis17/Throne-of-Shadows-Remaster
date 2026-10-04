@@ -3,6 +3,33 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const { Pool } = require('pg');
+
+// Database (Neon Postgres)
+const pool = process.env.DATABASE_URL ? new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+}) : null;
+
+async function initDb() {
+  if (!pool) {
+    console.log('No DATABASE_URL — running without persistent storage');
+    return;
+  }
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS players (
+        name TEXT PRIMARY KEY,
+        data JSONB NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    console.log('Database ready');
+  } catch (e) {
+    console.error('DB init failed:', e.message);
+  }
+}
+initDb();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -110,6 +137,59 @@ app.post('/api/guest', (req, res) => {
     created: Date.now()
   };
   res.json({ ok: true, guest: req.session.guest });
+});
+
+// Save player data to DB
+app.post('/api/save', async (req, res) => {
+  const guest = req.session.guest;
+  if (!guest || !pool) return res.json({ ok: false });
+  const { hero } = req.body || {};
+  if (!hero) return res.json({ ok: false });
+  try {
+    await pool.query(
+      `INSERT INTO players (name, data) VALUES ($1, $2)
+       ON CONFLICT (name) DO UPDATE SET data = $2, updated_at = NOW()`,
+      [guest.name, JSON.stringify(hero)]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false, error: e.message });
+  }
+});
+
+// Load player data from DB
+app.get('/api/load', async (req, res) => {
+  const guest = req.session.guest;
+  if (!guest || !pool) return res.json({ ok: true, hero: null });
+  try {
+    const r = await pool.query('SELECT data FROM players WHERE name = $1', [guest.name]);
+    res.json({ ok: true, hero: r.rows[0]?.data || null });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
+// GM: inspect any player
+app.get('/api/gm/inspect/:name', async (req, res) => {
+  if (!isGM(req) || !pool) return res.json({ ok: false });
+  try {
+    const r = await pool.query('SELECT data, updated_at FROM players WHERE name = $1', [req.params.name]);
+    if (!r.rows[0]) return res.json({ ok: false, error: 'Not found' });
+    res.json({ ok: true, player: r.rows[0].data, updated: r.rows[0].updated_at });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
+// GM: list all players
+app.get('/api/gm/players', async (req, res) => {
+  if (!isGM(req) || !pool) return res.json({ ok: false });
+  try {
+    const r = await pool.query('SELECT name, updated_at FROM players ORDER BY updated_at DESC LIMIT 50');
+    res.json({ ok: true, players: r.rows });
+  } catch (e) {
+    res.json({ ok: false });
+  }
 });
 
 app.get('/api/session', (req, res) => {
