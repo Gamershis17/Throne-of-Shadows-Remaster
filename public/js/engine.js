@@ -64,7 +64,7 @@ export function createHero(name, classId) {
   };
   // Hunter starts with 1 pet — simple companion, no complex system
   if (classId === 'hunter') {
-    hero.pet = { name: 'Wolf', emoji: '🐺', loyalty: 100, level: 1 };
+    hero.pet = { name: 'Wolf', emoji: '🐺', loyalty: 100, level: 1, diet: 'carnivore' };
   }
   return hero;
 }
@@ -78,14 +78,27 @@ export function petAttack(hero, enemy) {
   return { damage: dmg, killed: enemy.hp <= 0 };
 }
 
-// Feed pet — restores loyalty (costs gold)
-export function feedPet(hero) {
-  if (!hero.pet) return false;
-  const cost = 10 * hero.level;
-  if (hero.gold < cost) return false;
+// Pet food — type matters! Feed the right food for full effect.
+export const PET_FOODS = {
+  meat: { emoji: '🍖', name: 'Meat', loyalty: 25, cost: 10, for: ['carnivore'] },
+  fish: { emoji: '🐟', name: 'Fish', loyalty: 25, cost: 10, for: ['carnivore', 'piscivore'] },
+  berries: { emoji: '🫐', name: 'Berries', loyalty: 15, cost: 5, for: ['herbivore', 'omnivore'] },
+  honey: { emoji: '🍯', name: 'Honey', loyalty: 30, cost: 20, for: ['omnivore'] },
+};
+
+// Feed pet — right food = full loyalty, wrong food = half
+export function feedPet(hero, foodId) {
+  if (!hero.pet) return { ok: false };
+  const food = PET_FOODS[foodId];
+  if (!food) return { ok: false };
+  const cost = food.cost * hero.level;
+  if (hero.gold < cost) return { ok: false, reason: 'gold' };
   hero.gold -= cost;
-  hero.pet.loyalty = Math.min(100, hero.pet.loyalty + 25);
-  return true;
+  const diet = hero.pet.diet || 'carnivore';
+  const isRight = food.for.includes(diet);
+  const gain = isRight ? food.loyalty : Math.floor(food.loyalty / 2);
+  hero.pet.loyalty = Math.min(100, hero.pet.loyalty + gain);
+  return { ok: true, gain, rightFood: isRight, food };
 }
 
 // Calculate hero stats from level + gear

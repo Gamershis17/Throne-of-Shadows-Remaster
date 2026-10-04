@@ -379,3 +379,8 @@ body {
   padding: 6px 12px;
   font-size: 12px;
 }
+
+.food-btns {
+  display: flex;
+  gap: 6px;
+}

@@ -83,9 +83,11 @@ function renderSpells() {
         if (result.killed) onKill();
       }
       if (spell.id === 'mend' && hero.pet) {
-        Engine.feedPet(hero);
-        renderPet();
-        toast('💚 Pet fed and happy!');
+        const r = Engine.feedPet(hero, 'meat');
+        if (r.ok) {
+          renderPet();
+          toast('💚 Pet fed and happy!');
+        }
       }
     };
     bar.appendChild(btn);
@@ -100,18 +102,31 @@ function renderPet() {
   }
   bar.classList.remove('hidden');
   $('pet-emoji').textContent = hero.pet.emoji;
-  $('pet-loyalty').textContent = `Loyalty ${hero.pet.loyalty}%`;
-}
+  $('pet-loyalty').textContent = `${hero.pet.name} · Loyalty ${hero.pet.loyalty}%`;
 
-$('feed-btn') && ($('feed-btn').onclick = () => {
-  if (Engine.feedPet(hero)) {
-    renderPet();
-    updateHUD();
-    toast('🍖 Pet fed! Loyalty up.');
-  } else {
-    toast('Not enough gold to feed!');
+  // Food buttons — right food for diet = full effect
+  const fb = $('food-btns');
+  fb.innerHTML = '';
+  const diet = hero.pet.diet || 'carnivore';
+  for (const [fid, food] of Object.entries(Engine.PET_FOODS)) {
+    const isRight = food.for.includes(diet);
+    const btn = document.createElement('button');
+    btn.className = 'btn small' + (isRight ? ' gold' : '');
+    btn.textContent = `${food.emoji}`;
+    btn.title = `${food.name} — ${isRight ? '✓ loves it' : 'meh'} (${food.cost * hero.level}g)`;
+    btn.onclick = () => {
+      const r = Engine.feedPet(hero, fid);
+      if (!r.ok) {
+        toast(r.reason === 'gold' ? 'Not enough gold!' : 'Cannot feed');
+        return;
+      }
+      renderPet();
+      updateHUD();
+      toast(r.rightFood ? `${r.food.emoji} ${hero.pet.name} loved it! +${r.gain}` : `${r.food.emoji} ${hero.pet.name} nibbled... +${r.gain}`);
+    };
+    fb.appendChild(btn);
   }
-});
+}
 
 function renderEnemy() {
   $('enemy-emoji').textContent = enemy.emoji;
