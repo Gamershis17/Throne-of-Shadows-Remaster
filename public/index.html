@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
   <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004k">
+  <link rel="stylesheet" href="css/style.css?v20261004l">
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -205,43 +205,7 @@
           <div class="float-layer" id="float-layer"></div>
           <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
         </div>
-        <div class="battle-main" style="display:none;">
-          <div class="enemy-card" id="enemy-card" style="display:none;">
-            <div class="enemy-top">
-              <div class="enemy-sprite" id="enemy-sprite">🐺</div>
-              <div class="enemy-info">
-                <div class="enemy-name" id="enemy-name">—</div>
-                <div class="enemy-stage" id="enemy-stage">Stage 1</div>
-              </div>
-              <div class="boss-badge hidden" id="boss-badge">BOSS</div>
-            </div>
-            <div class="bar hp enemy-hp"><div class="fill" id="enemy-hpfill"></div><span class="bar-text" id="enemy-hptext"></span></div>
-            <div class="boss-progress" id="boss-progress"><div class="boss-progress-fill" id="boss-progress-fill"></div><span class="boss-progress-text" id="boss-progress-text"></span></div>
-            <div class="enemy-atk" id="enemy-atk"></div>
-            <div class="float-layer" id="float-layer"></div>
-            <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
-          </div>
-
-          <div class="hero-panel">
-            <div class="bar hp"><div class="fill" id="hero-hpfill"></div><span class="bar-text" id="hero-hptext"></span></div>
-            <div class="hero-stats" id="hero-stats"></div>
-            <div class="party-chips hidden" id="dungeon-chips"></div>
-          </div>
-
-          <div class="battle-pet-hp hidden" id="battle-pet-hp">
-            <span class="bpet-label">🐾 Pet</span>
-            <div class="bpet-track"><div class="bpet-fill"></div></div>
-          </div>
-          <div class="meter" id="meter-panel">
-            <div class="meter-head">
-              <span class="meter-title">DAMAGE METER</span>
-              <span class="live-pill" id="meter-live"><span class="live-dot"></span>LIVE</span>
-              <span class="total-dps" id="total-dps">0 DPS</span>
-            </div>
-            <div id="meter-rows"></div>
-            <div class="meter-foot">shows last fight between kills &middot; updates every second</div>
-          </div>
-        </div>
+        <!-- Old battle-main removed: replaced by 2D arena -->
 
         <div class="battle-side">
           <button id="tap-btn" class="tap-btn">⚔️<span>TAP</span></button>
@@ -496,7 +460,7 @@
 <div id="gm-rainbow-frame"></div>
 <div id="toast-root"></div>
 
-<script type="module" src="js/app.js?v20261004k"></script>
+<script type="module" src="js/app.js?v20261004l"></script>
 <script type="module" src="js/gamepad.js?v=20261004j"></script>
 </body>
 </html>

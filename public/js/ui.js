@@ -2260,12 +2260,12 @@ export const UI = {
   setEnemy(enemy) {
     const e = this.els;
     // A fresh enemy never inherits the previous one's hit/death animation.
-    e['enemy-card'].classList.remove('modern-hit', 'modern-death');
+    if (e['enemy-card']) e['enemy-card'].classList.remove('modern-hit', 'modern-death');
     const world = Engine.worldForStage(enemy.stage);
     e['enemy-sprite'].textContent = enemy.radiant ? '🌟' : enemy.emoji;
     e['enemy-name'].textContent = enemy.radiant ? `Radiant ${enemy.name}` : enemy.name;
     e['enemy-name'].classList.toggle('enemy-name-boss', !!(enemy.boss || enemy.towerFloor));
-    e['enemy-card'].classList.toggle('radiant', !!enemy.radiant);
+    if (e['enemy-card']) e['enemy-card'].classList.toggle('radiant', !!enemy.radiant);
     // Raid waves show the wave counter instead of the stage.
     // Tower floors show the floor number and hazard.
     if (enemy.towerFloor) {
@@ -2274,19 +2274,21 @@ export const UI = {
       const stageWave = document.getElementById('stage-wave');
       if (stageNum) stageNum.textContent = `Stage ${Math.ceil(enemy.towerFloor / 10) || 1}`;
       if (stageWave) stageWave.textContent = `Floor ${enemy.towerFloor || 1} / 10 waves`;
-      e['enemy-stage'].textContent = `🗼 Tower — Floor ${enemy.towerFloor}` +
-        (hazard ? ` · ${hazard.emoji} ${hazard.name}` : '');
-      // Floor 1000+ gets the full rainbow; milestones get a softer version
-      const isMilestone = [100, 250, 500, 750].includes(enemy.towerFloor);
-      e['enemy-stage'].classList.toggle('floor-1000-shine', enemy.towerFloor >= 1000);
-      e['enemy-stage'].classList.toggle('floor-milestone-shine', isMilestone && enemy.towerFloor < 1000);
+      if (e['enemy-stage']) {
+        e['enemy-stage'].textContent = `🗼 Tower — Floor ${enemy.towerFloor}` +
+          (hazard ? ` · ${hazard.emoji} ${hazard.name}` : '');
+        // Floor 1000+ gets the full rainbow; milestones get a softer version
+        const isMilestone = [100, 250, 500, 750].includes(enemy.towerFloor);
+        e['enemy-stage'].classList.toggle('floor-1000-shine', enemy.towerFloor >= 1000);
+        e['enemy-stage'].classList.toggle('floor-milestone-shine', isMilestone && enemy.towerFloor < 1000);
+      }
     } else {
-      e['enemy-stage'].textContent = enemy.raidWave
+      if (e['enemy-stage']) e['enemy-stage'].textContent = enemy.raidWave
         ? `🌀 Raid — Wave ${enemy.raidWave}`
         : `Stage ${enemy.stage} · ${world.emoji} ${world.name}`;
     }
     e['boss-badge'].classList.toggle('hidden', !enemy.boss);
-    e['enemy-card'].classList.toggle('boss', !!enemy.boss);
+    if (e['enemy-card']) e['enemy-card'].classList.toggle('boss', !!enemy.boss);
     // Boss progress tracker: bosses every 10 stages.
     try {
       const bpFill = document.getElementById('boss-progress-fill');
@@ -2310,7 +2312,7 @@ export const UI = {
         bpWrap.style.display = 'none'; // hidden during raids
       }
     } catch { /* ignore */ }
-    e['enemy-atk'].textContent = `⚔️ ${formatNum(enemy.attack)} atk · 🛡️ ${formatNum(enemy.defense || 0)} def`;
+    if (e['enemy-atk']) e['enemy-atk'].textContent = `⚔️ ${formatNum(enemy.attack)} atk · 🛡️ ${formatNum(enemy.defense || 0)} def`;
     this.updateEnemy(enemy);
   },
 
