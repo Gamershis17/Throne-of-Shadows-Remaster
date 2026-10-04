@@ -400,3 +400,82 @@ body {
   transition: width 0.3s;
   border-radius: 7px;
 }
+
+/* --- Dungeon Run --- */
+.dungeon-run {
+  position: fixed;
+  inset: 0;
+  background: #0a0812;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  padding-bottom: 100px;
+}
+
+.dungeon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-weight: bold;
+}
+
+.dr-party {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.dr-member {
+  min-width: 80px;
+  text-align: center;
+  background: #141020;
+  border-radius: 8px;
+  padding: 8px 4px;
+  font-size: 12px;
+}
+
+.dr-member .m-hp {
+  height: 6px;
+  background: #2a2440;
+  border-radius: 3px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.dr-member .m-hp-fill {
+  height: 100%;
+  background: #e5484d;
+  transition: width 0.3s;
+}
+
+.dr-enemies {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.dr-enemy {
+  text-align: center;
+  font-size: 48px;
+}
+
+.dr-enemy .e-hp {
+  width: 160px;
+  height: 10px;
+  background: #2a2440;
+  border-radius: 5px;
+  margin: 8px auto 0;
+  overflow: hidden;
+}
+
+.dr-enemy .e-hp-fill {
+  height: 100%;
+  background: #8b5cf6;
+  transition: width 0.3s;
+}

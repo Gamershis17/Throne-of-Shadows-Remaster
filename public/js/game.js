@@ -466,6 +466,198 @@ function renderParty() {
   });
 }
 
+// --- Dungeon Runs ---
+let dungeonRun = null;
+let dungeonTimer = null;
+
+function enterDungeon(dungeonId) {
+  if (!Engine.validateParty(party)) {
+    toast('Need full 5-man party!');
+    return;
+  }
+  dungeonRun = Engine.startDungeon(dungeonId, hero, party);
+  dungeonRun.party = party;
+  // Init party HP
+  for (const m of party.members) {
+    if (!m.isPlayer) dungeonRun.partyHp[m.id] = m.maxHp;
+  }
+  $('dungeon-run').classList.remove('hidden');
+  $('dr-name').textContent = `${dungeonRun.dungeon.emoji} ${dungeonRun.dungeon.name}`;
+  startDungeonWave();
+}
+
+function startDungeonWave() {
+  const enemies = Engine.spawnDungeonWave(dungeonRun, hero);
+  $('dr-wave').textContent = `Wave ${dungeonRun.wave}/${dungeonRun.dungeon.waves}`;
+  renderDungeonParty();
+  renderDungeonEnemies();
+  startDungeonCombat();
+}
+
+function renderDungeonParty() {
+  const el = $('dr-party');
+  el.innerHTML = '';
+  // Player
+  const stats = Engine.heroStats(hero);
+  const pdiv = document.createElement('div');
+  pdiv.className = 'dr-member';
+  pdiv.innerHTML = `${Engine.CLASSES[hero.classId].emoji}<br>${hero.name}<br>
+    <div class="m-hp"><div class="m-hp-fill" id="dr-php" style="width:${heroHp/stats.hp*100}%"></div></div>`;
+  el.appendChild(pdiv);
+  // NPCs
+  for (const m of party.members) {
+    if (m.isPlayer) continue;
+    const hp = dungeonRun.partyHp[m.id] || m.maxHp;
+    const div = document.createElement('div');
+    div.className = 'dr-member';
+    div.innerHTML = `${m.emoji}<br>${m.name}<br>
+      <div class="m-hp"><div class="m-hp-fill" id="dr-hp-${m.id}" style="width:${hp/m.maxHp*100}%"></div></div>`;
+    el.appendChild(div);
+  }
+}
+
+function renderDungeonEnemies() {
+  const el = $('dr-enemies');
+  el.innerHTML = '';
+  dungeonRun.enemies.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'dr-enemy';
+    div.innerHTML = `${e.emoji}<div style="font-size:14px">${e.name}</div>
+      <div class="e-hp"><div class="e-hp-fill" id="dr-ehp-${i}" style="width:${e.hp/e.maxHp*100}%"></div></div>`;
+    el.appendChild(div);
+  });
+}
+
+function startDungeonCombat() {
+  clearInterval(dungeonTimer);
+  dungeonTimer = setInterval(() => {
+    if (!dungeonRun) return;
+    // Party auto-attacks
+    for (const m of party.members) {
+      if (m.isPlayer) continue; // Player taps manually
+      if (m.role === 'healer') {
+        const h = Engine.healerAct(m, dungeonRun, hero, heroHp);
+        if (h) {
+          if (h.target === 'player') {
+            heroHp = Math.min(Engine.heroStats(hero).hp, heroHp + h.amount);
+            const f = $('dr-php');
+            if (f) f.style.width = (heroHp / Engine.heroStats(hero).hp * 100) + '%';
+          } else {
+            const f = $(`dr-hp-${dungeonRun.party.members.find(x => x.name === h.target)?.id}`);
+            // Update bar
+          }
+          renderDungeonParty();
+        }
+        continue;
+      }
+      // DPS and Tank attack
+      const r = Engine.partyAttack(m, dungeonRun.enemies, hero);
+      if (r) {
+        const idx = dungeonRun.enemies.indexOf(r.target);
+        const bar = $(`dr-ehp-${idx}`);
+        if (bar) bar.style.width = (r.target.hp / r.target.maxHp * 100) + '%';
+        if (dungeonRun.enemies.every(e => e.hp <= 0)) {
+          onDungeonWaveClear();
+          return;
+        }
+      }
+    }
+    // Enemies attack random party member
+    const alive = dungeonRun.enemies.filter(e => e.hp > 0);
+    if (alive.length) {
+      const e = alive[Math.floor(Math.random() * alive.length)];
+      // Tank takes hits first (50% chance to intercept)
+      const tank = party.members.find(m => m.role === 'tank' && !m.isPlayer);
+      let target = null;
+      if (tank && Math.random() < 0.5 && (dungeonRun.partyHp[tank.id] > 0)) {
+        target = tank;
+      } else {
+        // Random target
+        const candidates = party.members.filter(m => !m.isPlayer && (dungeonRun.partyHp[m.id] || 0) > 0);
+        if (Math.random() < 0.3 || !candidates.length) {
+          // Hit player
+          const dmg = Math.max(1, Math.floor(e.atk * 0.5));
+          heroHp = Math.max(0, heroHp - dmg);
+          const f = $('dr-php');
+          if (f) f.style.width = (heroHp / Engine.heroStats(hero).hp * 100) + '%';
+          if (heroHp <= 0) {
+            onDungeonWipe();
+            return;
+          }
+        } else {
+          target = candidates[Math.floor(Math.random() * candidates.length)];
+        }
+      }
+      if (target) {
+        const dmg = Math.max(1, Math.floor(e.atk * (0.85 + Math.random() * 0.3)));
+        dungeonRun.partyHp[target.id] = Math.max(0, (dungeonRun.partyHp[target.id] || target.maxHp) - dmg);
+        const bar = $(`dr-hp-${target.id}`);
+        if (bar) bar.style.width = (dungeonRun.partyHp[target.id] / target.maxHp * 100) + '%';
+      }
+    }
+  }, 2000);
+}
+
+$('dr-attack').addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  if (!dungeonRun) return;
+  const r = Engine.partyAttack({ isPlayer: true }, dungeonRun.enemies, hero);
+  if (r) {
+    const idx = dungeonRun.enemies.indexOf(r.target);
+    const bar = $(`dr-ehp-${idx}`);
+    if (bar) bar.style.width = (r.target.hp / r.target.maxHp * 100) + '%';
+    if (dungeonRun.enemies.every(e => e.hp <= 0)) onDungeonWaveClear();
+  }
+});
+
+function onDungeonWaveClear() {
+  clearInterval(dungeonTimer);
+  // Rewards for wave
+  let gold = 0, xp = 0;
+  for (const e of dungeonRun.enemies) {
+    gold += e.goldReward;
+    xp += e.xpReward;
+  }
+  hero.gold += gold;
+  const levels = Engine.awardXp(hero, xp);
+  toast(`Wave ${dungeonRun.wave} cleared! +${gold}g +${xp}xp`);
+
+  dungeonRun.wave++;
+  if (dungeonRun.wave > dungeonRun.dungeon.waves) {
+    onDungeonComplete();
+  } else {
+    setTimeout(() => startDungeonWave(), 1500);
+  }
+}
+
+function onDungeonComplete() {
+  clearInterval(dungeonTimer);
+  const bonus = dungeonRun.dungeon.waves * 100;
+  hero.gold += bonus;
+  // Guaranteed gear drop
+  const drop = Engine.rollGearDrop(hero.stage + 10, true);
+  if (drop) hero.inventory.push(drop);
+  saveHero();
+  updateHUD();
+  $('dungeon-run').classList.add('hidden');
+  dungeonRun = null;
+  toast(`🎉 Dungeon complete! +${bonus}g${drop ? ` + ${drop.name}` : ''}`);
+}
+
+function onDungeonWipe() {
+  clearInterval(dungeonTimer);
+  $('dungeon-run').classList.add('hidden');
+  dungeonRun = null;
+  heroHp = Engine.heroStats(hero).hp;
+  toast('💀 Party wiped! Try again when stronger.');
+}
+
+$('dr-leave').onclick = () => {
+  clearInterval(dungeonTimer);
+  $('dungeon-run').classList.add('hidden');
+  dungeonRun = null;
+};
+
 // --- Dungeons ---
 function renderDungeons() {
   const dl = $('dungeon-list');
@@ -482,7 +674,9 @@ function renderDungeons() {
       </button>`;
     dl.appendChild(div);
   }
-  // TODO: dungeon run logic
+  dl.querySelectorAll('[data-dungeon]').forEach(btn => {
+    btn.onclick = () => enterDungeon(btn.dataset.dungeon);
+  });
 }
 
 // --- Tabs ---

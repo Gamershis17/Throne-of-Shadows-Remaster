@@ -295,6 +295,90 @@ export function createParty(playerClass) {
   };
 }
 
+// --- Dungeon Runs ---
+// Start a dungeon run
+export function startDungeon(dungeonId, hero, party) {
+  const dungeon = DUNGEONS.find(d => d.id === dungeonId);
+  if (!dungeon) return null;
+  return {
+    dungeon,
+    wave: 1,
+    enemies: [],
+    partyHp: {}, // member id -> current hp
+    done: false,
+  };
+}
+
+// Spawn wave enemies (scaled to dungeon difficulty)
+export function spawnDungeonWave(run, hero) {
+  const d = run.dungeon;
+  const isFinal = run.wave === d.waves;
+  const count = isFinal ? 1 : 2 + Math.floor(Math.random() * 2); // 2-3 normal, 1 boss
+  run.enemies = [];
+  for (let i = 0; i < count; i++) {
+    const baseStage = hero.stage + (d.unlockStage / 2);
+    const enemy = makeEnemy(Math.floor(baseStage));
+    if (isFinal) {
+      // Final wave = boss
+      enemy.isBoss = true;
+      enemy.hp = enemy.maxHp = Math.floor(enemy.hp * 2);
+      enemy.atk = Math.floor(enemy.atk * 1.5);
+      enemy.xpReward = Math.floor(enemy.xpReward * 3);
+      enemy.goldReward = Math.floor(enemy.goldReward * 3);
+    }
+    run.enemies.push(enemy);
+  }
+  return run.enemies;
+}
+
+// Party member attacks (NPC AI)
+export function partyAttack(member, enemies, hero) {
+  // Find alive enemy
+  const target = enemies.find(e => e.hp > 0);
+  if (!target) return null;
+  let dmg = 0;
+  if (member.isPlayer) {
+    const stats = heroStats(hero);
+    dmg = Math.max(1, Math.floor(stats.atk * (0.85 + Math.random() * 0.3)));
+  } else {
+    dmg = Math.max(1, Math.floor(member.atk * (0.85 + Math.random() * 0.3)));
+  }
+  target.hp = Math.max(0, target.hp - dmg);
+  return { damage: dmg, target, killed: target.hp <= 0 };
+}
+
+// Healer heals lowest HP party member
+export function healerAct(healer, run, hero, heroHp) {
+  // Find lowest HP member (including player)
+  let lowest = null;
+  let lowestPct = 2;
+  // Check player
+  const maxHp = heroStats(hero).hp;
+  const playerPct = heroHp / maxHp;
+  if (playerPct < lowestPct) {
+    lowestPct = playerPct;
+    lowest = { isPlayer: true };
+  }
+  // Check NPCs
+  for (const m of run.party.members) {
+    if (m.isPlayer || m.role !== 'tank' && m.role !== 'dps') continue;
+    if (m.id === healer.id) continue;
+    const pct = (run.partyHp[m.id] || m.maxHp) / m.maxHp;
+    if (pct < lowestPct) {
+      lowestPct = pct;
+      lowest = m;
+    }
+  }
+  if (!lowest || lowestPct > 0.8) return null; // Only heal if below 80%
+  const amount = healer.heal || 30;
+  if (lowest.isPlayer) {
+    return { target: 'player', amount };
+  } else {
+    run.partyHp[lowest.id] = Math.min(lowest.maxHp, (run.partyHp[lowest.id] || lowest.maxHp) + amount);
+    return { target: lowest.name, amount };
+  }
+}
+
 // Check if party is full and valid (1 tank, 1 healer, 3 dps)
 export function validateParty(party) {
   const counts = { tank: 0, healer: 0, dps: 0 };
