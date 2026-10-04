@@ -7050,3 +7050,18 @@ body.theme-gothic-manor .panel, body.theme-gothic-manor .card {
   pointer-events: none;
   z-index: 0;
 }
+
+.mockup-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 20px rgba(212, 160, 23, 0.3));
+}
+
+@media (max-width: 480px) {
+  .mockup-logo {
+    width: 90px;
+    height: 90px;
+  }
+}
