@@ -58,6 +58,7 @@ $('start-btn').onclick = async () => {
 
   $('view-class').classList.add('hidden');
   $('view-game').classList.remove('hidden');
+  checkGM();
   startBattle();
   updateHUD();
 };
@@ -878,6 +879,99 @@ $('chat-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') sendChat();
 });
 
+// --- GM ---
+let isGMUser = false;
+let lastAnnounceSeen = 0;
+
+async function checkGM() {
+  // GM if hero name matches (simple check)
+  // Real check happens server-side on GM endpoints
+  const gmNames = ['Gamershis17'];
+  isGMUser = gmNames.includes(hero.name);
+  if (isGMUser) {
+    $('gm-tab-btn').classList.remove('hidden');
+  }
+}
+
+async function loadGMFeedback() {
+  try {
+    const r = await fetch('/api/gm/feedback');
+    const d = await r.json();
+    if (!d.ok) return;
+    const el = $('gm-feedback-list');
+    el.innerHTML = d.feedback.length ? '' : '<p style="color:#666">No feedback yet.</p>';
+    for (const f of d.feedback) {
+      const div = document.createElement('div');
+      div.className = 'gear-item';
+      div.innerHTML = `<div><div class="g-name">${escapeHtml(f.from)}</div>
+        <div class="g-stats">${escapeHtml(f.text)}</div></div>`;
+      el.appendChild(div);
+    }
+  } catch {}
+}
+
+// Announcement polling
+setInterval(async () => {
+  if (!hero) return;
+  try {
+    const r = await fetch(`/api/announcement?since=${lastAnnounceSeen}`);
+    const d = await r.json();
+    if (d.ok && d.announcement) {
+      lastAnnounceSeen = d.announcement.at;
+      $('gm-announce-by').textContent = `<GM> ${d.announcement.by}`;
+      $('gm-announce-text').textContent = d.announcement.text;
+      $('gm-announce').classList.remove('hidden');
+    }
+  } catch {}
+}, 5000);
+
+$('gm-announce-close').onclick = () => $('gm-announce').classList.add('hidden');
+
+// GM broadcast
+$('gm-broadcast-btn') && ($('gm-broadcast-btn').onclick = async () => {
+  const text = $('gm-broadcast-input').value.trim();
+  if (!text) return;
+  await fetch('/api/gm/broadcast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  $('gm-broadcast-input').value = '';
+  toast('📢 Broadcast sent!');
+});
+
+// GM self stat editing
+$('gm-gold-btn') && ($('gm-gold-btn').onclick = () => {
+  const v = parseInt($('gm-gold-input').value);
+  if (v >= 0) { hero.gold = v; saveHero(); updateHUD(); toast(`💰 Gold set to ${v}`); }
+});
+$('gm-level-btn') && ($('gm-level-btn').onclick = () => {
+  const v = parseInt($('gm-level-input').value);
+  if (v >= 1 && v <= 100) {
+    hero.level = v;
+    heroHp = Engine.heroStats(hero).hp;
+    heroMana = Engine.heroStats(hero).mana;
+    saveHero(); updateHUD(); toast(`🎉 Level set to ${v}`);
+  }
+});
+$('gm-stage-btn') && ($('gm-stage-btn').onclick = () => {
+  const v = parseInt($('gm-stage-input').value);
+  if (v >= 1) { hero.stage = v; saveHero(); updateHUD(); startBattle(); toast(`🗺️ Stage set to ${v}`); }
+});
+
+// Feedback
+$('feedback-btn') && ($('feedback-btn').onclick = async () => {
+  const text = $('feedback-input').value.trim();
+  if (!text) return;
+  await fetch('/api/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, type: 'feedback' }),
+  });
+  $('feedback-input').value = '';
+  toast('📝 Feedback sent! Thanks.');
+});
+
 // --- Tabs ---
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.onclick = () => {
@@ -890,6 +984,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'quests') renderQuests();
     if (btn.dataset.tab === 'auction') renderAuction();
     if (btn.dataset.tab === 'mail') renderMail();
+    if (btn.dataset.tab === 'gm') loadGMFeedback();
     if (btn.dataset.tab === 'chat') {
       loadChat();
       clearInterval(chatTimer);
@@ -924,6 +1019,7 @@ try {
     }
     $('view-class').classList.add('hidden');
     $('view-game').classList.remove('hidden');
+    checkGM();
     startBattle();
     updateHUD();
   }

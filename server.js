@@ -32,6 +32,56 @@ app.get('/api/chat', (req, res) => {
   res.json({ ok: true, messages: chatMessages.slice(-20) });
 });
 
+// --- GM Tools ---
+let gmAnnouncement = null;
+const feedbackList = [];
+
+function isGM(req) {
+  const guest = req.session.guest;
+  if (!guest) return false;
+  return GMS.includes(guest.name);
+}
+
+// Broadcast announcement (pops up on all players)
+app.post('/api/gm/broadcast', (req, res) => {
+  if (!isGM(req)) return res.json({ ok: false, error: 'Not GM' });
+  const { text } = req.body || {};
+  if (!text) return res.json({ ok: false });
+  gmAnnouncement = { text: text.slice(0, 300), at: Date.now(), by: req.session.guest.name };
+  res.json({ ok: true });
+});
+
+app.get('/api/announcement', (req, res) => {
+  // Only send if newer than client's last seen
+  const since = parseInt(req.query.since) || 0;
+  if (gmAnnouncement && gmAnnouncement.at > since) {
+    res.json({ ok: true, announcement: gmAnnouncement });
+  } else {
+    res.json({ ok: true, announcement: null });
+  }
+});
+
+// Player feedback
+app.post('/api/feedback', (req, res) => {
+  const { text, type } = req.body || {};
+  if (!text) return res.json({ ok: false });
+  const guest = req.session.guest;
+  feedbackList.push({
+    id: Date.now(),
+    from: guest ? guest.name : 'Guest',
+    type: type || 'feedback',
+    text: text.slice(0, 500),
+    at: Date.now(),
+  });
+  if (feedbackList.length > 100) feedbackList.shift();
+  res.json({ ok: true });
+});
+
+app.get('/api/gm/feedback', (req, res) => {
+  if (!isGM(req)) return res.json({ ok: false });
+  res.json({ ok: true, feedback: feedbackList.slice().reverse() });
+});
+
 app.post('/api/chat', (req, res) => {
   const { text } = req.body || {};
   if (!text || text.length > 200) return res.json({ ok: false });

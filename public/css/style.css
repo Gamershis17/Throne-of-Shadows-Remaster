@@ -526,3 +526,34 @@ body {
   color: #e8e0d0;
   font-size: 14px;
 }
+
+/* --- GM --- */
+.gm-announce {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gm-announce-box {
+  background: #1a1528;
+  border: 2px solid #ffd23f;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.gm-announce-head {
+  color: #ffd23f;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.gm-announce-box button {
+  margin-top: 16px;
+}

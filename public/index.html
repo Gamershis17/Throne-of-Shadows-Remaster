@@ -57,6 +57,13 @@
   </div>
 
   <div id="loot-toast" class="loot-toast hidden"></div>
+  <div id="gm-announce" class="gm-announce hidden">
+    <div class="gm-announce-box">
+      <div class="gm-announce-head">📢 <span id="gm-announce-by"></span></div>
+      <div id="gm-announce-text"></div>
+      <button id="gm-announce-close" class="btn gold">OK</button>
+    </div>
+  </div>
 
   <nav class="tabbar">
     <button class="tab-btn active" data-tab="battle">⚔️<span>Battle</span></button>
@@ -66,6 +73,7 @@
     <button class="tab-btn" data-tab="auction">🏪<span>Auction</span></button>
     <button class="tab-btn" data-tab="mail">📬<span>Mail</span></button>
     <button class="tab-btn" data-tab="chat">💬<span>Chat</span></button>
+    <button class="tab-btn hidden" id="gm-tab-btn" data-tab="gm">👑<span>GM</span></button>
     <button class="tab-btn" data-tab="character">👤<span>Hero</span></button>
     <button class="tab-btn" data-tab="gear">🎒<span>Gear</span></button>
     <button class="tab-btn" data-tab="settings">⚙️<span>Settings</span></button>
@@ -91,6 +99,30 @@
     <div id="party-list" class="gear-list"></div>
     <h3>🍺 Recruit Companions</h3>
     <div id="recruit-list" class="gear-list"></div>
+  </section>
+
+  <section id="tab-gm" class="tab hidden">
+    <h2>👑 GM Panel</h2>
+    <h3>📢 Broadcast</h3>
+    <div class="chat-input-row">
+      <input id="gm-broadcast-input" placeholder="Announcement to all players..." maxlength="300">
+      <button id="gm-broadcast-btn" class="btn gold">Send</button>
+    </div>
+    <h3>📝 Player Feedback</h3>
+    <div id="gm-feedback-list" class="gear-list"></div>
+    <h3>⚙️ Self Stats</h3>
+    <div class="chat-input-row">
+      <input id="gm-gold-input" type="number" placeholder="Gold amount" style="width:120px">
+      <button id="gm-gold-btn" class="btn small">Set Gold</button>
+    </div>
+    <div class="chat-input-row" style="margin-top:8px">
+      <input id="gm-level-input" type="number" placeholder="Level" style="width:120px">
+      <button id="gm-level-btn" class="btn small">Set Level</button>
+    </div>
+    <div class="chat-input-row" style="margin-top:8px">
+      <input id="gm-stage-input" type="number" placeholder="Stage" style="width:120px">
+      <button id="gm-stage-btn" class="btn small">Set Stage</button>
+    </div>
   </section>
 
   <section id="tab-chat" class="tab hidden">
@@ -143,7 +175,14 @@
 
   <section id="tab-settings" class="tab hidden">
     <h2>⚙️ Settings</h2>
-    <button id="logout-btn" class="btn">Log Out</button>
+    <h3>📝 Send Feedback</h3>
+    <div class="chat-input-row">
+      <input id="feedback-input" placeholder="Bug report or suggestion..." maxlength="500">
+      <button id="feedback-btn" class="btn small gold">Send</button>
+    </div>
+    <div style="margin-top:16px">
+      <button id="logout-btn" class="btn">Log Out</button>
+    </div>
   </section>
 </section>
 
