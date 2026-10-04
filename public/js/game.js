@@ -97,7 +97,26 @@ function renderSpells() {
 function renderPet() {
   const bar = $('pet-bar');
   if (!hero.pet) {
-    bar.classList.add('hidden');
+    // Hunter with no pet — offer to find one
+    if (hero.classId === 'hunter') {
+      bar.classList.remove('hidden');
+      bar.innerHTML = `<span>💔 No pet</span><button id="find-pet-btn" class="btn small gold">🔍 Find Pet</button>`;
+      $('find-pet-btn').onclick = () => {
+        const r = Engine.findPet(hero);
+        if (!r.ok) {
+          toast(r.reason === 'gold' ? `Need ${r.cost}g for a pet!` : 'Cannot find pet');
+          return;
+        }
+        // Rebuild pet bar
+        bar.innerHTML = `<span id="pet-emoji">🐺</span><span id="pet-loyalty"></span><div id="food-btns" class="food-btns"></div>`;
+        renderPet();
+        updateHUD();
+        saveHero();
+        toast(`🎉 ${r.pet.emoji} ${r.pet.name} joined you!`);
+      };
+    } else {
+      bar.classList.add('hidden');
+    }
     return;
   }
   bar.classList.remove('hidden');
@@ -243,7 +262,14 @@ function doAttack() {
       floatText(`🐾 ${petResult.damage}`, 'normal', false);
       // Loyalty drains slowly
       hero.pet.loyalty = Math.max(0, hero.pet.loyalty - 1);
-      renderPet();
+      const left = Engine.checkPetLeave(hero);
+      if (left) {
+        toast(`💔 ${left} left you... (loyalty hit 0)`);
+        renderPet();
+        updateHUD();
+      } else {
+        renderPet();
+      }
       if (petResult.killed) {
         updateEnemyBar();
         onKill();

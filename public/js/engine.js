@@ -69,13 +69,40 @@ export function createHero(name, classId) {
   return hero;
 }
 
-// Pet attacks — damage scales with loyalty
+// Pet attacks — damage scales with loyalty: 50% at 0, 150% at full
 export function petAttack(hero, enemy) {
   if (!hero.pet || hero.pet.loyalty <= 0) return null;
-  const loyaltyMult = 0.5 + (hero.pet.loyalty / 100) * 0.5;
+  const loyaltyMult = 0.5 + (hero.pet.loyalty / 100) * 1.0;
   const dmg = Math.max(1, Math.floor(hero.level * 2 * loyaltyMult));
   enemy.hp = Math.max(0, enemy.hp - dmg);
   return { damage: dmg, killed: enemy.hp <= 0 };
+}
+
+// Check if pet leaves (loyalty hit 0)
+export function checkPetLeave(hero) {
+  if (hero.pet && hero.pet.loyalty <= 0) {
+    const name = hero.pet.name;
+    hero.pet = null;
+    return name;
+  }
+  return null;
+}
+
+// Hunter can find a new pet (costs gold)
+export function findPet(hero) {
+  if (hero.classId !== 'hunter') return { ok: false, reason: 'class' };
+  if (hero.pet) return { ok: false, reason: 'has_pet' };
+  const cost = 100 * hero.level;
+  if (hero.gold < cost) return { ok: false, reason: 'gold', cost };
+  hero.gold -= cost;
+  const pets = [
+    { name: 'Wolf', emoji: '🐺', diet: 'carnivore' },
+    { name: 'Bear', emoji: '🐻', diet: 'omnivore' },
+    { name: 'Hawk', emoji: '🦅', diet: 'carnivore' },
+  ];
+  const p = pets[Math.floor(Math.random() * pets.length)];
+  hero.pet = { ...p, loyalty: 50, level: 1 };
+  return { ok: true, pet: hero.pet, cost };
 }
 
 // Pet food — type matters! Feed the right food for full effect.
