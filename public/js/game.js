@@ -901,14 +901,56 @@ let isGMUser = false;
 let lastAnnounceSeen = 0;
 
 async function checkGM() {
-  // GM if hero name matches (simple check)
-  // Real check happens server-side on GM endpoints
-  const gmNames = ['Gamershis17'];
-  isGMUser = gmNames.includes(hero.name);
-  if (isGMUser) {
-    $('gm-tab-btn').classList.remove('hidden');
+  try {
+    const r = await fetch('/api/role');
+    const d = await r.json();
+    const role = d.role || 'player';
+    // GM and Admin see the panel (Admin gets limited features)
+    if (role === 'gm' || role === 'admin') {
+      isGMUser = true;
+      $('gm-tab-btn').classList.remove('hidden');
+      // Hide god powers for non-GM admins
+      if (role !== 'gm') {
+        const gp = $('gm-godmode');
+        if (gp) gp.style.display = 'none';
+        const gg = $('gm-gear');
+        if (gg) gg.style.display = 'none';
+      }
+    }
+    // Show role in HUD
+    if (role !== 'player') {
+      const lvl = $('hud-level');
+      if (lvl) lvl.textContent += ` [${role.toUpperCase()}]`;
+    }
+  } catch {
+    // Fallback: hardcoded GM
+    if (hero.name === 'Gamershis17' || hero.name === 'Jass') {
+      isGMUser = true;
+      $('gm-tab-btn').classList.remove('hidden');
+    }
   }
 }
+
+// Set player role
+$('gm-role-btn') && ($('gm-role-btn').onclick = async () => {
+  const name = $('gm-role-name').value.trim();
+  const role = $('gm-role-select').value;
+  if (!name) return;
+  const r = await fetch(`/api/gm/setrole/${encodeURIComponent(name)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ role }),
+  });
+  const d = await r.json();
+  if (d.ok) {
+    Engine.logGMAction(hero, 'setrole', `${name} -> ${role}`);
+    saveHero();
+    toast(`👥 ${name} is now ${role.toUpperCase()}`);
+    $('gm-role-name').value = '';
+  } else {
+    toast('Failed — player not found or no permission');
+  }
+});
 
 async function loadGMFeedback() {
   try {

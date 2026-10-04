@@ -112,6 +112,18 @@
     </div>
     <h3>📝 Player Feedback</h3>
     <div id="gm-feedback-list" class="gear-list"></div>
+    <h3>👥 Manage Roles</h3>
+    <div class="chat-input-row">
+      <input id="gm-role-name" placeholder="Player name" style="flex:1">
+      <select id="gm-role-select" style="padding:8px;background:#141008;border:2px solid #4a3a1a;border-radius:4px;color:#d4c5a0">
+        <option value="player">Player</option>
+        <option value="tester">Tester</option>
+        <option value="admin">Admin</option>
+        <option value="gm">GM</option>
+      </select>
+      <button id="gm-role-btn" class="btn small gold">Set</button>
+    </div>
+    <p class="muted small" style="margin-top:4px">GM: full powers · Admin: broadcast + inspect · Tester: early access</p>
     <h3>🔍 Inspect Player</h3>
     <div class="chat-input-row">
       <input id="gm-inspect-input" placeholder="Player name" style="flex:1">

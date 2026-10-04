@@ -53,8 +53,33 @@ app.get('/api/status', (req, res) => {
 const chatMessages = [];
 const MAX_CHAT = 50;
 
-// GM list (usernames)
-const GMS = (process.env.GM_USERS || 'Gamershis17').split(',');
+// GM list (usernames) — can also be set via database roles
+const GMS = (process.env.GM_USERS || 'Gamershis17,Jass').split(',');
+
+async function getRole(name) {
+  if (GMS.includes(name)) return 'gm';
+  if (!pool) return 'player';
+  try {
+    const r = await pool.query('SELECT data FROM players WHERE name = $1', [name]);
+    return r.rows[0]?.data?.role || 'player';
+  } catch { return 'player'; }
+}
+
+function hasRole(req, ...roles) {
+  const guest = req.session.guest;
+  if (!guest) return false;
+  if (GMS.includes(guest.name)) return true; // GMS env always GM
+  // Check DB role (async, so we do it in the endpoint)
+  return false;
+}
+
+async function checkRole(req, ...roles) {
+  const guest = req.session.guest;
+  if (!guest) return false;
+  if (GMS.includes(guest.name)) return true;
+  const role = await getRole(guest.name);
+  return roles.includes(role);
+}
 
 app.get('/api/chat', (req, res) => {
   res.json({ ok: true, messages: chatMessages.slice(-20) });
@@ -69,6 +94,32 @@ function isGM(req) {
   if (!guest) return false;
   return GMS.includes(guest.name);
 }
+
+// GM can set player roles
+app.post('/api/gm/setrole/:name', async (req, res) => {
+  if (!isGM(req) || !pool) return res.json({ ok: false });
+  const { role } = req.body || {};
+  if (!['player', 'tester', 'admin', 'gm'].includes(role)) return res.json({ ok: false });
+  try {
+    const r = await pool.query('SELECT data FROM players WHERE name = $1', [req.params.name]);
+    if (!r.rows[0]) return res.json({ ok: false, error: 'Player not found' });
+    const data = r.rows[0].data;
+    data.role = role;
+    await pool.query('UPDATE players SET data = $1 WHERE name = $2',
+      [JSON.stringify(data), req.params.name]);
+    res.json({ ok: true, role });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
+// Get own role
+app.get('/api/role', async (req, res) => {
+  const guest = req.session.guest;
+  if (!guest) return res.json({ ok: true, role: 'player' });
+  const role = await getRole(guest.name);
+  res.json({ ok: true, role });
+});
 
 // Broadcast announcement (pops up on all players)
 app.post('/api/gm/broadcast', (req, res) => {
