@@ -15,6 +15,7 @@ let selectedClass = 'warrior';
 let autoTimer = null;
 let manaTimer = null;
 let spellCooldowns = {};
+let battlePaused = false;
 
 // --- Class Select ---
 function renderClasses() {
@@ -310,8 +311,9 @@ function doAttack() {
   if (result.killed) {
     onKill();
   } else {
-    // Enemy counterattacks
+    // Enemy counterattacks (paused when tab hidden)
     setTimeout(() => {
+      if (battlePaused) return;
       if (!enemy || enemy.hp <= 0) return;
       if (godMode) {
         floatText('🛡️ BLOCKED', 'crit', true);
@@ -377,11 +379,13 @@ function onDeath() {
 function startAutoAttack() {
   clearInterval(autoTimer);
   autoTimer = setInterval(() => {
+    if (battlePaused) return;
     if (enemy && enemy.hp > 0 && heroHp > 0) doAttack();
   }, 3000); // Auto-attack every 3s
-  // Mana regen
+  // Mana regen (pauses when tab hidden)
   clearInterval(manaTimer);
   manaTimer = setInterval(() => {
+    if (battlePaused) return;
     const max = Engine.heroStats(hero).mana;
     heroMana = Math.min(max, heroMana + Math.floor(max * 0.05));
     updateManaBar();
@@ -1130,6 +1134,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
     btn.classList.add('active');
     $('tab-' + btn.dataset.tab).classList.remove('hidden');
+    // Pause battle when not on battle tab
+    battlePaused = btn.dataset.tab !== 'battle';
     if (btn.dataset.tab === 'party') renderParty();
     if (btn.dataset.tab === 'dungeon') renderDungeons();
     if (btn.dataset.tab === 'quests') renderQuests();
