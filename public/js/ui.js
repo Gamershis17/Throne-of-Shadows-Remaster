@@ -4670,21 +4670,6 @@ export const UI = {
 
   renderParty(state, ctx) {
     this.renderMpParty((ctx && ctx.mpParty) || null, ctx, state);
-    // Team Synergy Bar
-    const synergyEl = this.els['party-synergy'];
-    if (synergyEl && Engine.computeSynergy) {
-      const syn = Engine.computeSynergy(state.party);
-      if (syn.bonuses.length > 0) {
-        synergyEl.innerHTML = `<div class="synergy-bar">
-          <div class="synergy-title">⚡ Team Synergy (${syn.count}/3)</div>
-          ${syn.bonuses.map(b => `<div class="synergy-bonus">${esc(b)}</div>`).join('')}
-        </div>`;
-        synergyEl.classList.remove('hidden');
-      } else {
-        synergyEl.innerHTML = `<div class="synergy-bar empty"><div class="synergy-title">⚡ Team Synergy</div><div class="muted small">Recruit companions with different roles to unlock bonuses!</div></div>`;
-        synergyEl.classList.remove('hidden');
-      }
-    }
     const slots = this.els['party-slots'];
     // Safety: missing element (stale HTML after deploy) — skip silently.
     if (!slots) return;
@@ -4950,10 +4935,7 @@ export const UI = {
     const panel = document.getElementById('pets-section');
     if (!panel) return;
     panel.innerHTML = '';
-    this._breedSel = [];
-    this._combineSel = [];
     const p = Engine.ensurePets(state);
-    this._breedState = p;
     // --- Pet Shop ---
     const shop = document.createElement('div');
     shop.className = 'pet-shop';
@@ -4981,22 +4963,6 @@ export const UI = {
       <div class="shop-grid">${cards}</div>`;
     panel.appendChild(shop);
 
-    // --- Coming-soon teasers (visible, locked, not obtainable) ---
-    if (Engine.PET_TEASERS && Engine.PET_TEASERS.length) {
-      const teasers = document.createElement('div');
-      teasers.className = 'pet-teasers';
-      teasers.innerHTML = `
-        <div class="shop-head"><span class="shop-title">🔮 Coming Soon</span>
-          <span class="muted small">not yet obtainable</span></div>
-        <div class="shop-grid">` + Engine.PET_TEASERS.map(t => `
-          <div class="shop-card teaser-card">
-            <div class="shop-emoji teaser-emoji">${t.emoji}</div>
-            <div class="shop-name">${esc(t.name)}</div>
-            <div class="muted small shop-desc">${esc(t.desc)}</div>
-            <span class="teaser-badge">🔒 COMING SOON</span>
-          </div>`).join('') + `</div>`;
-      panel.appendChild(teasers);
-    }
 
     // --- Eggs ---
     const eggRow = document.createElement('div');
@@ -5204,7 +5170,7 @@ export const UI = {
       const race = Engine.RACES[en.race] || {};
       const cls = Engine.CLASSES[en.playerClass] || {};
       const spec = Engine.SPECS[en.spec] || {};
-      const title = en.title ? `<span class="lb-title">${esc(Engine.titleName(en.title))}</span>` : '';
+      const title = '';
       const flag = en.country ? Engine.countryFlag(en.country) : '';
       const badge = en.badge ? Engine.badgeDef(en.badge) : null;
       const badgeHtml = badge ? `<span class="lb-badge" title="${esc(badge.name)}">${badge.emoji}</span> ` : '';
