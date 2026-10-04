@@ -1,16 +1,16 @@
 // ============================================================
 // app.js — boot, session flow, game loops, combat wiring.
 // ============================================================
-import { api } from './api.js?v=20260930ar';
-import * as Engine from './engine.js?v20261004j';
-import { UI, esc, formatNum } from './ui.js?v20261004j';
-import { Auth } from './auth.js?v=20260930ar';
+import { api } from './api.js?v=20261004k';
+import * as Engine from './engine.js?v=20261004k';
+import { UI, esc, formatNum } from './ui.js?v=20261004k';
+import { Auth } from './auth.js?v=20261004k';
 
-import { Raid } from './raid.js?v=20260930ar';
-import { renderGuildSection, syncGuildPerks } from './guild.js?v=20261001e';
-import { loadGuest, saveGuest, clearGuest, GUEST_ROLE } from './guest.js?v=20260930ar';
-import { Realm } from './realm.js?v20261004j';
-import { Audio } from './audio.js?v20261004j';
+import { Raid } from './raid.js?v=20261004k';
+import { renderGuildSection, syncGuildPerks } from './guild.js?v=20261004k';
+import { loadGuest, saveGuest, clearGuest, GUEST_ROLE } from './guest.js?v=20261004k';
+import { Realm } from './realm.js?v=20261004k';
+import { Audio } from './audio.js?v=20261004k';
 
 const TICK_MS = 250;
 const AUTOSAVE_MS = 15000;
