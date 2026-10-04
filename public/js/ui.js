@@ -427,17 +427,6 @@ export const UI = {
     listen('mine-btn', 'click', () => {
       if (this.handlers.onMine) this.handlers.onMine();
     });
-    // Fishing: cast/strike button (pointerdown for instant mobile response,
-    // click as fallback; guard against double-fire)
-    let fishBtnFired = 0;
-    const fishBtnHandler = () => {
-      const now = Date.now();
-      if (now - fishBtnFired < 300) return;
-      fishBtnFired = now;
-      if (this.handlers.onFish) this.handlers.onFish();
-    };
-    listen('fish-btn', 'pointerdown', fishBtnHandler);
-    listen('fish-btn', 'click', fishBtnHandler);
     // Mine: the ore node itself is also a tap target. It's what players
     // naturally tap, and on small screens the MINE button sits below the
     // pickaxe ladder — a tap on the rock must never feel dead.
@@ -456,12 +445,6 @@ export const UI = {
       const btn = e.target.closest('button[data-action="buy-pickaxe"]');
       if (!btn || btn.disabled) return;
       if (this.handlers.onPickaxeUpgrade) this.handlers.onPickaxeUpgrade();
-    });
-    // Fishing: buy rod
-    listen('fishing-shop', 'click', (e) => {
-      const btn = e.target.closest('button[data-action="buy-rod"]');
-      if (!btn || btn.disabled) return;
-      if (this.handlers.onBuyRod) this.handlers.onBuyRod(btn.dataset.rod);
     });
     listen('upgrade-list', 'click', (e) => {
       const btn = e.target.closest('button[data-upgrade]');
@@ -1098,8 +1081,6 @@ export const UI = {
   },
 
   showTab(name) {
-    // Fish tab temporarily locked (loot table bug under repair)
-    if (name === 'fish') return;
     this.activeTab = name;
     if (name !== 'quests') { this._stopQuestCountdowns(); this._stopQuestSync(); }
     if (name !== 'tokenshop') this._stopTokenCountdown();
@@ -1623,24 +1604,14 @@ export const UI = {
     if (forms) forms.classList.toggle('hidden', !!isGuest);
   },
 
-  // Event banner: shows Halloween and/or 2x multiplier status.
+  // Event banner: shows 2x multiplier status. (Halloween removed for remaster.)
   updateEventBanner(state) {
     const banner = document.getElementById('event-banner');
     if (!banner) return;
-    const parts = [];
     const is2x = (state && (state.xpMultiplier || 1.0) >= 2.0);
-    const halloween = Engine.isEventActive && Engine.isEventActive('HALLOWEEN');
-    if (is2x && halloween) {
-      banner.className = 'event-2x-banner';
-      banner.innerHTML = '🔥 2X XP & 2X GOLD IS LIVE! 🔥 | 🎃 HALLOWEEN EVENT ACTIVE! 🎃';
-      banner.classList.remove('hidden');
-    } else if (is2x) {
+    if (is2x) {
       banner.className = 'event-2x-banner';
       banner.innerHTML = '🔥 2X XP & 2X GOLD IS LIVE! 🔥';
-      banner.classList.remove('hidden');
-    } else if (halloween) {
-      banner.className = 'halloween-banner';
-      banner.innerHTML = '🎃 HALLOWEEN EVENT IS LIVE! BATTLE TOWER BOSSES FOR PUMPKIN SHARDS! 🎃';
       banner.classList.remove('hidden');
     } else {
       banner.classList.add('hidden');
@@ -4410,132 +4381,6 @@ export const UI = {
       }).join('');
     }
   },
-
-  // ---------------- Fishing ----------------
-  updateFishGrid(state) {
-    const grid = document.getElementById('fish-grid');
-    if (!grid) return;
-    // Return early if player data is gone (kicked to login, session cleared)
-    if (!state || typeof App === 'undefined' || !App.state) return;
-    const fish = (state && state.fish) || {};
-    const lootTable = Engine.FISHING_LOOT_TABLE || {};
-    // Combine all catchable items
-    const allItems = {
-      ...(Engine.FISH_SPECIES || {}),
-      ...Object.fromEntries(((lootTable.junk) || []).map(f => [f.id, f])),
-      ...Object.fromEntries(((lootTable.special) || []).map(f => [f.id, f])),
-      ...(lootTable.golden && lootTable.golden.id ? { [lootTable.golden.id]: lootTable.golden } : {}),
-    };
-    const entries = Object.entries(allItems);
-    if (!entries.length) {
-      grid.innerHTML = '<div class="muted">No fish yet — cast your line!</div>';
-      return;
-    }
-    // Show fishing level
-    const fLvl = Engine.getFishingLevel ? Engine.getFishingLevel(state) : 1;
-    const fXp = (state && state.fishingXp) || 0;
-    let html = `<div style="grid-column:1/-1;text-align:center;padding:8px;background:#1a2a1a;border-radius:8px;margin-bottom:8px">🎣 Fishing Lv ${fLvl} <span style="color:#888">(${fXp} XP)</span></div>`;
-    html += entries.map(([id, f]) => {
-      const count = fish[id] || 0;
-      const healAmt = Math.round((f.goldValue || 10) / 10);
-      const isGolden = id === 'golden_fish';
-      return `<div class="fish-card ${f.rarity}">
-        <div class="fish-emoji">${f.emoji}</div>
-        <div><b>${esc(f.name)}</b></div>
-        <div class="muted tiny">${f.rarity}</div>
-        <div>×${count}</div>
-        ${isGolden && f.description ? `<div class="muted tiny" style="font-size:10px">${esc(f.description)}</div>` : ''}
-        ${count > 0 ? `<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
-          <button class="small" data-fish-action="sell" data-id="${id}" style="font-size:11px">💰 Sell</button>
-          <button class="small" data-fish-action="eat" data-id="${id}" style="font-size:11px">${isGolden ? '✨ Eat (Buff!)' : `🍽️ Eat (+${healAmt} HP)`}</button>
-          ${!isGolden ? `<button class="small" data-fish-action="feed" data-id="${id}" style="font-size:11px">🐾 Feed Pet</button>` : ''}
-        </div>` : `<div class="muted tiny">💰 ${formatNum(f.goldValue || 0)}</div>`}
-      </div>`;
-    }).join('');
-    grid.innerHTML = html;
-  },
-
-  updateFishingShop(state) {
-    const shop = document.getElementById('fishing-shop');
-    if (!shop) return;
-    const order = ['stick', 'bamboo', 'steel', 'mithril', 'whisper'];
-    const curRod = (state && state.fishingRod) || 'stick';
-    const curIdx = order.indexOf(curRod);
-    let html = '<div style="grid-column:1/-1"><h3 style="margin:8px 0 4px">🎣 Rods</h3></div>';
-    html += order.map((rodId, i) => {
-      const rod = Engine.FISHING_RODS[rodId];
-      const owned = i <= curIdx;
-      const isNext = i === curIdx + 1;
-      const btn = owned
-        ? `<button class="btn small ghost" disabled>✔ Owned</button>`
-        : isNext
-          ? `<button class="btn small gold" data-action="buy-rod" data-rod="${rodId}">Buy 🎣</button>`
-          : `<button class="btn small" disabled>🔒</button>`;
-      return `<div class="shop-card${owned ? ' owned' : ''}">
-        <div class="shop-emoji">🎣</div>
-        <div class="shop-name">${esc(rod.name)}</div>
-        <div class="muted small">Green zone: ${Math.round(rod.greenZone * 100)}%</div>
-        <div class="muted small">+${rod.rarityBoost}% rare chance</div>
-        ${owned ? '' : `<div class="muted small">💰 ${formatNum(rod.cost)}</div>`}
-        <div style="margin-top:8px">${btn}</div>
-      </div>`;
-    }).join('');
-    // Catfish bait shop
-    html += '<div style="grid-column:1/-1"><h3 style="margin:12px 0 4px">🪱 Catfish\'s Bait</h3></div>';
-    const baitInv = (state && state.bait) || {};
-    const activeBait = state && state.activeBait;
-    html += Object.entries(Engine.FISHING_BAIT || {}).map(([baitId, bait]) => {
-      const count = baitInv[baitId] || 0;
-      const isActive = activeBait === baitId;
-      return `<div class="shop-card">
-        <div class="shop-emoji">${bait.emoji}</div>
-        <div class="shop-name">${esc(bait.name)}${isActive ? ' ✅' : ''}</div>
-        <div class="muted small">${esc(bait.desc)}</div>
-        <div class="muted small">💰 ${bait.cost} for 5 · Owned: ${count}</div>
-        <div style="margin-top:8px;display:flex;gap:4px">
-          <button class="btn small gold" data-fish-action="buy-bait" data-id="${baitId}">Buy</button>
-          ${count > 0 && !isActive ? `<button class="btn small" data-fish-action="use-bait" data-id="${baitId}">Use</button>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-    shop.innerHTML = html;
-    this.updateFishingQuests(state);
-  },
-
-  updateFishingQuests(state) {
-    let box = document.getElementById('fishing-quests');
-    if (!box) return;
-    const quests = Engine.ensureFishingQuests(state);
-    box.innerHTML = '<h3 style="margin:12px 0 4px">📜 Daily Quests</h3>' +
-      Engine.FISHING_QUESTS.map(q => {
-        const prog = quests.progress[q.id] || 0;
-        const done = prog >= q.targetCount;
-        const claimed = quests.claimed[q.id];
-        const pct = Math.round(prog / q.targetCount * 100);
-        const rewardTxt = [
-          q.reward.gold ? `💰${q.reward.gold}` : '',
-          q.reward.fishingXp ? `🎣${q.reward.fishingXp} XP` : '',
-          q.reward.bait ? Object.entries(q.reward.bait).map(([b, c]) => `${Engine.FISHING_BAIT[b].emoji}x${c}`).join(' ') : '',
-        ].filter(Boolean).join(' ');
-        return `<div class="shop-card" style="${claimed ? 'opacity:0.5' : ''}">
-          <div class="shop-emoji">${q.emoji}</div>
-          <div class="shop-name">${esc(q.name)}</div>
-          <div class="muted small">${esc(q.desc)}</div>
-          <div style="background:#222;border-radius:4px;height:8px;margin:6px 0">
-            <div style="background:${done ? '#4a4' : '#48c'};height:100%;width:${pct}%;border-radius:4px"></div>
-          </div>
-          <div class="muted small">${prog}/${q.targetCount} · Reward: ${rewardTxt}</div>
-          <div style="margin-top:6px">
-            ${claimed ? '<span style="color:#888">✓ Claimed</span>'
-              : done ? `<button class="btn small gold" data-fish-action="claim-quest" data-id="${q.id}">Claim!</button>`
-              : '<span style="color:#888;font-size:12px">In progress...</span>'}
-          </div>
-        </div>`;
-      }).join('');
-  },
-
-  // ---------------- quests ----------------
-  // ms until the next quest reset boundary (UTC).
   _msToNextDaily(nowMs) {
     const d = new Date(nowMs);
     return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1) - nowMs;
@@ -5371,7 +5216,6 @@ export const UI = {
     rebirths: { emoji: '🌀', label: 'Rebirths', fmt: (en) => (en.rebirth > 0 ? en.rebirth : '—') },
     bossrush: { emoji: '⚔️', label: 'Boss Rush', fmt: (en) => en.bossRushMs > 0 ? Engine.formatBossRushTime(en.bossRushMs) : '—' },
     tower:    { emoji: '🗼', label: 'Tower',    fmt: (en) => (en.towerFloor > 0 ? 'Floor ' + en.towerFloor : '—') },
-    fish:     { emoji: '🎣', label: 'Fish Caught', fmt: (en) => (en.totalFish > 0 ? formatNum(en.totalFish) : '—') },
     biggestcatch: { emoji: '🐠', label: 'Biggest Catch', fmt: (en) => (en.biggestCatch > 0 ? '💰' + formatNum(en.biggestCatch) : '—') },
   },
   lbCategory: 'level',

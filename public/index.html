@@ -231,101 +231,6 @@
         <div id="mining-shop" class="shop-grid"></div>
       </section>
 
-      <!-- FISHING -->
-      <section id="tab-fish" class="tab">
-        <h2>🎣 Lake of Whispers</h2>
-        <div class="fish-scene">
-          <div class="fish-sky">
-            <div class="fish-sun"></div>
-            <div class="fish-cloud fish-cloud-1"></div>
-            <div class="fish-cloud fish-cloud-2"></div>
-            <div class="fish-birds">🦅</div>
-          </div>
-          <div class="fish-mountains"></div>
-          <div class="fish-far-trees">
-            <div class="far-tree" style="left:2%;font-size:28px">🌲</div>
-            <div class="far-tree" style="left:8%;font-size:20px;opacity:0.5">🌳</div>
-            <div class="far-tree" style="left:15%;font-size:32px">🌲</div>
-            <div class="far-tree" style="left:22%;font-size:18px;opacity:0.4">🎄</div>
-            <div class="far-tree" style="left:68%;font-size:26px">🌳</div>
-            <div class="far-tree" style="left:75%;font-size:34px">🌲</div>
-            <div class="far-tree" style="left:82%;font-size:20px;opacity:0.5">🎄</div>
-            <div class="far-tree" style="left:90%;font-size:28px">🌲</div>
-            <div class="far-tree" style="left:96%;font-size:22px;opacity:0.6">🌳</div>
-          </div>
-          <div class="fish-hills"></div>
-          <div class="fish-treeline">
-            <div class="fish-tree" style="left:3%">🌲</div>
-            <div class="fish-tree" style="left:10%">🌳</div>
-            <div class="fish-tree" style="left:18%">🌲</div>
-            <div class="fish-tree" style="left:28%">🌳</div>
-            <div class="fish-tree" style="left:65%">🌲</div>
-            <div class="fish-tree" style="left:73%">🌳</div>
-            <div class="fish-tree" style="left:82%">🌲</div>
-            <div class="fish-tree" style="left:90%">🌳</div>
-            <div class="fish-tree" style="left:96%">🌲</div>
-          </div>
-          <div class="fish-meadow"></div>
-          <div class="fish-shore"></div>
-          <div class="fish-water">
-            <div class="fish-jump fish-jump-1">🐟</div>
-            <div class="fish-jump fish-jump-2">🐠</div>
-            <div class="fish-jump fish-jump-3">🐟</div>
-            <div class="fish-ripple"></div>
-            <div class="fish-ripple fish-ripple-2"></div>
-          </div>
-          <div class="fish-dock">
-            <div class="dock-plank"></div>
-            <div class="dock-plank"></div>
-            <div class="dock-plank"></div>
-            <div class="dock-plank"></div>
-            <div class="dock-post dock-post-left"></div>
-            <div class="dock-post dock-post-right"></div>
-            <div class="dock-lantern">🏮</div>
-          </div>
-          <div id="fish-rod" class="fish-rod"><span style="font-size:64px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))">🎣</span></div>
-          <svg id="fish-line-svg" class="fish-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path id="fish-line-path" d="" stroke="#ddd" stroke-width="0.5" fill="none"/>
-          </svg>
-          <div id="fish-bobber" class="fish-bobber hidden">🔴</div>
-          <div id="fish-splash" class="fish-splash hidden">💦</div>
-          <div class="fish-reeds">
-            <div class="reed" style="left:2%">🌾</div>
-            <div class="reed" style="left:95%">🌾</div>
-          </div>
-        </div>
-        <div id="fishing-ui">
-        <p class="muted small" style="margin:0 0 8px">Cast your line and time the strike when the marker hits the green zone!</p>
-        <div id="fish-lake" class="fish-lake">
-          <div id="fish-timing-bar" class="fish-timing-bar hidden">
-            <div id="fish-green-zone" class="fish-green-zone"></div>
-            <div id="fish-marker" class="fish-marker"></div>
-          </div>
-          <div id="fish-status" class="fish-status muted">Tap CAST to begin fishing...</div>
-        </div>
-        <button id="fish-btn" class="btn fish-btn"><span class="fish-emoji">🎣</span> <span id="fish-btn-text">CAST</span></button>
-        <div id="fish-catch" class="fish-catch"></div>
-        <div id="catfish-npc" style="background:linear-gradient(135deg,#1a2a1a,#0d1a0d);border:2px solid #4a7c4a;border-radius:12px;padding:14px;margin:12px 0;display:flex;gap:12px;align-items:center">
-          <div style="font-size:48px">🧓🎣</div>
-          <div style="flex:1">
-            <div style="font-weight:bold;color:#8f8;font-size:16px">Catfish</div>
-            <div style="font-size:12px;color:#888;font-style:italic">Old-timer of the Lake</div>
-            <div id="catfish-dialogue" style="margin-top:8px;font-size:14px;color:#ddd">"Well hey there, young angler! The fish are bitin' today. Go on, cast yer line!"</div>
-            <button class="small" data-fish-action="talk" style="margin-top:8px">💬 Talk</button>
-          </div>
-        </div>
-        <div class="fish-panel">
-          <div class="fish-panel-header">🐟 Fish Collection</div>
-          <div id="fish-grid" class="fish-grid"></div>
-        </div>
-        <div class="fish-panel">
-          <div class="fish-panel-header">🎣 Tackle Shop</div>
-          <p class="muted small" style="margin:4px 0">Better rods = bigger green zone + rarer catches.</p>
-          <div id="fishing-shop" class="shop-grid"></div>
-          <div id="fishing-quests" class="shop-grid" style="margin-top:8px"></div>
-        </div>
-        </div>
-      </section>
 
       <!-- GEAR -->
       <section id="tab-gear" class="tab">
@@ -635,7 +540,6 @@
       <button class="tab-btn active" data-tab="battle"><span class="ticon">⚔️</span><span>Battle</span></button>
       <button class="tab-btn" id="spellbook-open"><span class="ticon">📖</span><span>Spells</span></button>
       <button class="tab-btn" data-tab="mine"><span class="ticon">⛏️</span><span>Mine</span></button>
-      <button class="tab-btn" data-tab="fish" disabled style="opacity:0.4"><span class="ticon">🎣</span><span>Fish 🔒</span></button>
       <button class="tab-btn" data-tab="gear"><span class="ticon">🎒</span><span>Inventory</span></button>
       <button class="tab-btn" data-tab="armory"><span class="ticon">⚒️</span><span>Armory</span></button>
       <button class="tab-btn" data-tab="tokenshop"><span class="ticon">🌀</span><span>Token Shop</span></button>
