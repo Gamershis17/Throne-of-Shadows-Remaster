@@ -1,0 +1,415 @@
+{
+  "_comment": "Throne of Shadows Remaster - Balance Configuration",
+  "_note": "All tunable gameplay numbers live here. Edit values, no code changes needed.",
+  "_version": "1.8.0",
+  "combat": {
+    "boss_hp_mult": 1.5,
+    "crit_base_chance": 5,
+    "crit_base_damage": 150,
+    "enemy_atk_base": 10,
+    "enemy_atk_growth": 1.12,
+    "enemy_hp_base": 100,
+    "enemy_hp_growth": 1.15
+  },
+  "content_tiers": {
+    "tier_0_pre_raid": {
+      "description": "Pre-raid dungeon grind - farm blue BiS gear",
+      "required_level": 60
+    },
+    "tier_1_molten_depths": {
+      "attunement_flag": "has_core_fragment",
+      "description": "Fire & Molten Depths - first raid tier",
+      "gate_mechanic": {
+        "base_ambient_damage": 1000,
+        "damage_type": "fire",
+        "k_constant": 100,
+        "recommended_min_resistance": 150,
+        "tick_rate_seconds": 2.0
+      },
+      "required_level": 60,
+      "raid_sim": {
+        "boss_hp": 1500000,
+        "dps_per_raider": 150,
+        "healer_mana_pool": 500000,
+        "mana_per_hp": 0.2,
+        "max_fight_seconds": 600
+      }
+    },
+    "tier_2_dragons_lair": {
+      "required_level": 60,
+      "attunement_flag": "has_drakefire_amulet",
+      "description": "Dragon's Brood & Lair - shadow-flame cloak required",
+      "gate_mechanic": {
+        "damage_type": "fire",
+        "base_ambient_damage": 1200,
+        "tick_rate_seconds": 2.0,
+        "k_constant": 180,
+        "recommended_min_resistance": 270,
+        "required_equipped_item": "Onyxia Scale Cloak"
+      },
+      "raid_sim": {
+        "boss_hp": 2500000,
+        "dps_per_raider": 150,
+        "healer_mana_pool": 1000000,
+        "mana_per_hp": 0.2,
+        "max_fight_seconds": 600
+      }
+    },
+    "tier_3_desert_hive": {
+      "required_level": 60,
+      "attunement_flag": "war_effort_complete",
+      "description": "Desert Hive & War Effort - nature resistance + server event",
+      "gate_mechanic": {
+        "damage_type": "nature",
+        "base_ambient_damage": 1500,
+        "tick_rate_seconds": 2.0,
+        "k_constant": 250,
+        "recommended_min_resistance": 375
+      },
+      "raid_sim": {
+        "boss_hp": 3500000,
+        "dps_per_raider": 150,
+        "healer_mana_pool": 2000000,
+        "mana_per_hp": 0.2,
+        "max_fight_seconds": 600
+      }
+    }
+  },
+  "drops": {
+    "gear_drop_base": 0.15,
+    "potion_chance": 0.08
+  },
+  "economy": {
+    "gold_base": 10,
+    "gold_growth": 1.1,
+    "repair_cost_mult": 0.1
+  },
+  "systems": {
+    "resistance_scaling": {
+      "description": "Smooth diminishing returns curve for elemental gear checks.",
+      "formula": "damage_taken = base_damage * (1 - (resistance / (resistance + K)))"
+    },
+    "offline_progress": {
+      "offline_max_hours": 12,
+      "description": "Gains earned while app is closed. Capped to prevent exploitation.",
+      "offline_rates": {
+        "gold_per_hour": 500,
+        "rep_per_hour": 50,
+        "materials_per_hour": {
+          "Thorium Ore": 2,
+          "Plaguebloom Herb": 2,
+          "Runecloth Bandage": 5,
+          "Essence of Fire": 0.5
+        }
+      }
+    }
+  },
+  "talents": {
+    "points_per_level": 1,
+    "start_level": 1
+  },
+  "xp": {
+    "base": 80,
+    "growth_tiers": [
+      {
+        "growth": 1.3,
+        "max_level": 30
+      },
+      {
+        "growth": 1.35,
+        "max_level": 60
+      }
+    ],
+    "guest_level_cap": 20,
+    "kill_base": 10,
+    "kill_cap_fraction": 0.05,
+    "kill_growth": 1.12,
+    "level_cap": 60
+  },
+  "tier_0_loot_tables": {
+    "blackrock_spire_lower": {
+      "boss_name": "Overlord Wyrmthalak",
+      "drops": [
+        {
+          "item_name": "Flame-weave Cloak",
+          "slot": "back",
+          "fire_resistance": 20,
+          "drop_rate": 0.2
+        }
+      ]
+    },
+    "scholomance": {
+      "boss_name": "Darkmaster Gandling",
+      "drops": [
+        {
+          "item_name": "Volcanic Shoulders",
+          "slot": "shoulders",
+          "fire_resistance": 20,
+          "drop_rate": 0.15
+        }
+      ]
+    },
+    "stratholme_live": {
+      "boss_name": "Grand Crusader Dathrohan",
+      "drops": [
+        {
+          "item_name": "Cinderhide Boots",
+          "slot": "feet",
+          "fire_resistance": 20,
+          "drop_rate": 0.12
+        }
+      ]
+    }
+  },
+  "quest_rewards": {
+    "drakefire_ring": {
+      "item_name": "Drakefire Ring",
+      "slot": "finger",
+      "fire_resistance": 25,
+      "source": "Blackrock Spire attunement quest (guaranteed)"
+    }
+  },
+  "crafting_recipes": {
+    "wildfire_bracers": {
+      "profession": "Tailoring/Leatherworking/Blacksmithing",
+      "materials": {
+        "essence_of_fire": 2
+      },
+      "stats": {
+        "slot": "wrist",
+        "fire_resistance": 15
+      }
+    },
+    "wildfire_belt": {
+      "profession": "Blacksmithing",
+      "materials": {
+        "thorium_bar": 20,
+        "essence_of_fire": 4
+      },
+      "stats": {
+        "slot": "waist",
+        "fire_resistance": 30
+      }
+    },
+    "onyxia_scale_cloak": {
+      "profession": "Tailoring/Leatherworking",
+      "materials": {
+        "onyxia_scale": 8,
+        "essence_of_fire": 10,
+        "thorium_thread": 4
+      },
+      "stats": {
+        "slot": "back",
+        "fire_resistance": 25,
+        "special": "Immunity to Shadow-Flame"
+      },
+      "source": "Onyxia Scales drop from Molten Depths bosses (Tier 1)"
+    }
+  },
+  "consumables": {
+    "fire_protection_elixir": {
+      "effect": "+20 fire resistance for 1 hour",
+      "source": "Alchemy crafting or elemental zone farm"
+    }
+  },
+  "tier_1_loot_tables": {
+    "molten_depths": {
+      "boss_name": "Infernal Sovereign",
+      "drops": [
+        {
+          "item_name": "Crown of Embers",
+          "slot": "head",
+          "fire_resistance": 10,
+          "drop_rate": 0.15,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Magma-Forged Pauldrons",
+          "slot": "shoulders",
+          "fire_resistance": 15,
+          "drop_rate": 0.12,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Cinderstrike Blade",
+          "slot": "weapon",
+          "fire_resistance": 0,
+          "drop_rate": 0.08,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Obsidian Scale Boots",
+          "slot": "feet",
+          "fire_resistance": 12,
+          "drop_rate": 0.1,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Heart of the Inferno",
+          "slot": "trinket",
+          "fire_resistance": 20,
+          "drop_rate": 0.05,
+          "rarity": "legendary"
+        }
+      ],
+      "loot_rolls": 3
+    }
+  },
+  "attunement_chains": {
+    "tier_2_drakefire_amulet": {
+      "final_reward_flag": "has_drakefire_amulet",
+      "description": "Forge the Drakefire Amulet to unlock Tier 2: Dragon's Lair",
+      "steps": [
+        {
+          "step_id": 1,
+          "title": "The Black Dragon's Threat",
+          "zone": "blackrock_spire_lower",
+          "boss_target": "Overlord Wyrmthalak",
+          "required_item": "Dragonkin Threat Report",
+          "required_count": 1,
+          "drop_rate": 1.0
+        },
+        {
+          "step_id": 2,
+          "title": "The Eyes of the Black Dragon",
+          "zone": "scholomance",
+          "boss_target": "Darkmaster Gandling",
+          "required_item": "Fragment of the Eye",
+          "required_count": 2,
+          "drop_rate": 0.5
+        },
+        {
+          "step_id": 3,
+          "title": "The Fire Tempest",
+          "zone": "elemental_volcanic_zones",
+          "monster_target": "Fire Elemental",
+          "required_item": "Volcanic Ash",
+          "required_count": 20,
+          "drop_rate": 0.2
+        }
+      ]
+    }
+  },
+  "tier_2_loot_table": {
+    "dragons_lair": {
+      "boss_name": "Nefarian the Black Dragon",
+      "drops": [
+        {
+          "item_name": "Dragonstalker Helm",
+          "slot": "head",
+          "fire_resistance": 35,
+          "dps_bonus": 50,
+          "drop_rate": 0.15,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Bloodfang Chestpiece",
+          "slot": "chest",
+          "fire_resistance": 40,
+          "dps_bonus": 55,
+          "drop_rate": 0.12,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Judgement Spaulders",
+          "slot": "shoulders",
+          "fire_resistance": 35,
+          "dps_bonus": 50,
+          "drop_rate": 0.15,
+          "rarity": "epic"
+        },
+        {
+          "item_name": "Ashkandi, Greatsword of the Brotherhood",
+          "slot": "two-hand",
+          "fire_resistance": 0,
+          "dps_bonus": 120,
+          "drop_rate": 0.05,
+          "rarity": "legendary"
+        }
+      ],
+      "loot_rolls": 3
+    }
+  },
+  "server_events": {
+    "the_war_effort": {
+      "is_unlocked": false,
+      "dynamic_population_scale_factor": 0.05,
+      "global_target_contributions": 10000,
+      "current_contributions": 0,
+      "accepted_materials": [
+        {
+          "item_name": "Thorium Ore",
+          "points_per_item": 5
+        },
+        {
+          "item_name": "Plaguebloom Herb",
+          "points_per_item": 5
+        },
+        {
+          "item_name": "Runecloth Bandage",
+          "points_per_item": 2
+        }
+      ]
+    }
+  },
+  "tier_2_5_token_exchange": {
+    "description": "Trade Qiraji tokens + reputation + gold for Tier 2.5 gear",
+    "requirements": {
+      "helm_token": {
+        "token_required": "Vek'lor's Diadem",
+        "reward_item_name": "Doomcaller's Headpiece",
+        "slot": "head",
+        "stats": {
+          "nature_resistance": 45,
+          "dps_bonus": 65
+        },
+        "reputation_needed": "Brood_Honored",
+        "gold_cost": 150
+      },
+      "chest_token": {
+        "token_required": "Qiraji Bindings of Command",
+        "reward_item_name": "Deathdealer's Vest",
+        "slot": "chest",
+        "stats": {
+          "nature_resistance": 50,
+          "dps_bonus": 70
+        },
+        "reputation_needed": "Brood_Revered",
+        "gold_cost": 250
+      },
+      "shoulder_token": {
+        "token_required": "Qiraji Bindings of Dominance",
+        "reward_item_name": "Conqueror's Spaulders",
+        "slot": "shoulders",
+        "stats": {
+          "nature_resistance": 40,
+          "dps_bonus": 60
+        },
+        "reputation_needed": "Brood_Honored",
+        "gold_cost": 150
+      },
+      "leg_token": {
+        "token_required": "Vek'nilash's Circlet",
+        "reward_item_name": "Striker's Leggings",
+        "slot": "legs",
+        "stats": {
+          "nature_resistance": 45,
+          "dps_bonus": 65
+        },
+        "reputation_needed": "Brood_Revered",
+        "gold_cost": 250
+      },
+      "boot_token": {
+        "token_required": "Qiraji Idol of War",
+        "reward_item_name": "Footwraps of the Qiraji Prophet",
+        "slot": "feet",
+        "stats": {
+          "nature_resistance": 35,
+          "dps_bonus": 55
+        },
+        "reputation_needed": "Brood_Friendly",
+        "gold_cost": 100
+      }
+    }
+  }
+}

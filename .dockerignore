@@ -1,0 +1,11 @@
+# Keep the Docker build context clean. A stray node_modules entry committed
+# on 2026-09-28 broke `COPY . .` (symlink over the installed dir) and failed
+# the Render build with "Exited with status 1".
+node_modules
+.git
+.gitignore
+*.log
+npm-debug.log*
+.DS_Store
+# Local test/dev scratch, never needed in the image
+/tmp

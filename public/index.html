@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12101a">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.v2.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.v2.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.v2.png">
+  <link rel="icon" href="/icons/favicon.v2.ico" sizes="16x16 32x32 48x48">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
+  <title>Throne of Shadows</title>
+  <link rel="stylesheet" href="css/style.css?v20261003bk">
+</head>
+<body>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div id="ornate-texture" aria-hidden="true"></div>
+<div id="app">
+
+  <!-- ============ AUTH ============ -->
+  <section id="view-auth" class="view remaster-auth">
+    <div class="remaster-bg" aria-hidden="true"></div>
+    <div class="remaster-stars" aria-hidden="true"></div>
+    <div class="remaster-embers" aria-hidden="true"></div>
+    <div class="remaster-vignette" aria-hidden="true"></div>
+    <div class="auth-wrap auth-fantasy remaster-wrap">
+      <img class="logo-img remaster-logo" src="img/remaster-logo.webp" alt="Throne of Shadows Remaster logo">
+      <h1 class="game-title">THRONE OF SHADOWS</h1>
+      <div class="remaster-badge">✦ REMASTER ✦</div>
+      <p class="tagline">Tap. Loot. Raid. No rebirth.</p>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button id="auth-tab-login" class="auth-tab active" type="button">Login</button>
+          <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
+        </div>
+        <form id="login-form" class="auth-form" autocomplete="on">
+          <input id="login-username" placeholder="Username" autocomplete="username" maxlength="20">
+          <input id="login-password" type="password" placeholder="Password" autocomplete="current-password">
+          <button type="submit" class="btn gold">Login</button>
+        </form>
+        <form id="register-form" class="auth-form hidden" autocomplete="on">
+          <input id="reg-username" placeholder="Username (3–20, letters/numbers/_)" autocomplete="username" maxlength="20">
+          <input id="reg-password" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+          <input id="reg-password2" type="password" placeholder="Confirm password" autocomplete="new-password">
+          <button type="submit" class="btn gold">Create hero</button>
+          <p class="muted small" style="text-align:center;margin-top:8px;"><span class="cap-note">👑 Account level cap: 60</span></p>
+        </form>
+        <div id="auth-error" class="auth-error hidden"></div>
+        <div class="guest-block">
+          <div class="guest-divider"><span>or</span></div>
+          <div id="guest-continue" class="hidden">
+            <p class="muted small">Guest adventure found: <b id="guest-continue-name" class="gold-text"></b></p>
+            <button id="guest-continue-btn" class="btn wide" type="button">Continue as guest</button>
+            <button id="guest-fresh-btn" class="btn ghost small" type="button">start over instead</button>
+          </div>
+          <div id="guest-start">
+            <input id="guest-name" placeholder="Guest name (optional)" maxlength="16" autocomplete="off">
+            <button id="guest-play-btn" class="btn wide" type="button">Play as Guest</button>
+            <p class="muted small">No account needed. Progress saves on this device only.<br><span class="cap-note">⚔️ Guest level cap: 20</span></p>
+          </div>
+        </div>
+      </div>
+      <button id="discord-login" class="btn discord-big" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span>Join the Discord</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MAINTENANCE ============ -->
+  <section id="view-maintenance" class="view hidden">
+    <div class="auth-wrap">
+      <div class="logo">🛠️</div>
+      <h1>Down for maintenance</h1>
+      <p class="tagline" id="maintenance-message">We're polishing the realm. Back shortly.</p>
+      <p class="muted small">Checking again automatically…</p>
+      <button id="maintenance-off-btn" class="hidden" style="margin-top:16px;padding:12px 22px;border:none;border-radius:8px;font-size:15px;font-family:inherit;font-weight:bold;cursor:pointer;background:linear-gradient(180deg,#3fae5a,#2b7a3e);color:#eafff0">Turn maintenance OFF</button>
+      <p class="muted small" style="margin-top:18px;opacity:.55"><a href="/maintenance.html" style="color:inherit">staff</a></p>
+    </div>
+  </section>
+
+  <!-- ============ RACE SELECT (first run) ============ -->
+  <section id="view-race" class="view hidden">
+    <div class="race-wrap">
+      <h1>Choose your race</h1>
+      <p class="muted">This shapes your hero's destiny — choose wisely.</p>
+      <div id="race-grid" class="race-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-class" class="view hidden">
+    <div class="race-wrap">
+      <h1>Choose your class</h1>
+      <p class="muted">A <b>permanent</b> choice — pick the hero you want to be.</p>
+      <div id="class-grid" class="race-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-spec" class="view hidden">
+    <div class="race-wrap">
+      <h1>Choose your specialization</h1>
+      <p class="muted">Pairs with any class. A <b>permanent</b> choice.</p>
+      <div id="spec-grid" class="race-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-pet" class="view hidden">
+    <div class="race-wrap">
+      <h1>Choose your companion</h1>
+      <p class="muted">A hunter is never alone — pick the beast that fights beside you. A <b>permanent</b> choice.</p>
+      <div id="pet-grid" class="race-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ MAIN APP ============ -->
+  <section id="view-app" class="view hidden">
+    <div id="maintenance-banner" class="maint-banner hidden"></div>
+    <div id="update-banner" class="update-banner hidden"></div>
+    <div id="update-refresh" class="update-refresh hidden">
+      <div class="update-refresh-card">
+        <div class="update-refresh-title">⚠️ Game updated</div>
+        <div class="update-refresh-sub">Refreshing to the new version in <span class="update-refresh-num">10</span>s…</div>
+        <button class="btn gold wide update-refresh-now" type="button">Refresh now</button>
+      </div>
+    </div>
+    <header id="hud">
+      <div class="hud-row">
+        <div class="hud-id">
+          <span class="hud-avatar"><img id="hud-avatar-img" src="img/avatar-knight.webp" alt="" width="44" height="44" onerror="this.remove()"><span id="hud-emoji">🛡️</span></span>
+          <div>
+            <div id="hud-username">—</div>
+            <div id="hud-sub"><span id="hud-role" class="role-badge">player</span><span id="hud-guild-pill" class="guild-pill hidden"></span><span id="hud-race" class="muted"></span></div>
+          </div>
+        </div>
+        <div class="hud-currencies">
+          <div>💰 <span id="hud-gold">0</span></div>
+          <div>⭐ <span id="hud-stars">0</span></div>
+          <div>🗺️ <span id="hud-stage">1</span></div>
+        </div>
+        <button id="inn-btn" class="btn inn-btn inn-top-btn" type="button" title="Rest at Inn — safe AFK" aria-label="Rest at Inn"><span class="inn-house">🏠</span></button>
+        <button id="balance-log-hud" class="btn inn-btn inn-top-btn" type="button" title="Balance Log — nerf &amp; patch notes" aria-label="Balance Log">⚖️<span id="balance-log-badge-hud" class="hud-newdot hidden"></span></button>
+        <button id="changelog-hud" class="btn inn-btn inn-top-btn" type="button" title="Patch Notes — what's new" aria-label="Patch Notes">📰<span id="changelog-badge-hud" class="hud-newdot hidden"></span></button>
+        <button id="friends-hud" class="btn inn-btn inn-top-btn" type="button" title="Friends" aria-label="Friends">👥<span id="friend-req-badge-hud" class="hud-count hidden"></span></button>
+        <button id="social-hud" class="btn inn-btn inn-top-btn" type="button" title="Socials" aria-label="Socials"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      </div>
+      <div class="hud-row">
+        <div class="hud-level">Lv <span id="hud-level">1</span></div>
+        <div class="bar xp"><div class="fill" id="hud-xpfill"></div><span class="bar-text" id="hud-xptext"></span></div>
+      </div>
+      <div class="hud-row online-row"><div class="online-count-badge">🟢 <span id="online-count">–</span> Online</div></div>
+      <div class="hud-row buff-row"><div id="buff-bar" class="buff-bar"></div></div>
+      <div class="hud-row save-row"><span id="save-indicator" class="save-ind">● saved</span></div>
+    </header>
+    <div id="pause-pill" class="pause-pill hidden" role="status" aria-live="polite">⏸ <b>PAUSED</b><span class="pause-sub"> — world frozen</span></div>
+    <div id="event-banner" class="hidden"></div>
+
+    <main id="tab-content">
+      <!-- REMASTER: AI Director farming panel -->
+      <div id="directive-mount"></div>
+      <!-- BATTLE -->
+      <section id="tab-battle" class="tab active">
+        <div class="mode-switch" id="mode-switch">
+          <button class="mode-btn" data-mode="clicker">👆<span>Clicker</span></button>
+          <button class="mode-btn" data-mode="auto">🤖<span>Auto</span></button>
+          <button class="mode-btn" data-mode="dungeon">🏰<span>Dungeon</span></button>
+          <button class="mode-btn" data-mode="raid">🌀<span>Raid</span></button>
+          <button class="mode-btn" data-mode="tower">🗼<span>Tower</span></button>
+        </div>
+        <div class="battle-main">
+          <div class="enemy-card" id="enemy-card">
+            <div class="enemy-top">
+              <div class="enemy-sprite" id="enemy-sprite">🐺</div>
+              <div class="enemy-info">
+                <div class="enemy-name" id="enemy-name">—</div>
+                <div class="enemy-stage" id="enemy-stage">Stage 1</div>
+              </div>
+              <div class="boss-badge hidden" id="boss-badge">BOSS</div>
+            </div>
+            <div class="bar hp enemy-hp"><div class="fill" id="enemy-hpfill"></div><span class="bar-text" id="enemy-hptext"></span></div>
+            <div class="boss-progress" id="boss-progress"><div class="boss-progress-fill" id="boss-progress-fill"></div><span class="boss-progress-text" id="boss-progress-text"></span></div>
+            <div class="enemy-atk" id="enemy-atk"></div>
+            <div class="float-layer" id="float-layer"></div>
+            <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
+          </div>
+
+          <div class="hero-panel">
+            <div class="bar hp"><div class="fill" id="hero-hpfill"></div><span class="bar-text" id="hero-hptext"></span></div>
+            <div class="hero-stats" id="hero-stats"></div>
+            <div class="party-chips hidden" id="dungeon-chips"></div>
+          </div>
+
+          <div class="battle-pet-hp hidden" id="battle-pet-hp">
+            <span class="bpet-label">🐾 Pet</span>
+            <div class="bpet-track"><div class="bpet-fill"></div></div>
+          </div>
+          <div class="meter" id="meter-panel">
+            <div class="meter-head">
+              <span class="meter-title">DAMAGE METER</span>
+              <span class="live-pill" id="meter-live"><span class="live-dot"></span>LIVE</span>
+              <span class="total-dps" id="total-dps">0 DPS</span>
+            </div>
+            <div id="meter-rows"></div>
+            <div class="meter-foot">shows last fight between kills &middot; updates every second</div>
+          </div>
+        </div>
+
+        <div class="battle-side">
+          <button id="tap-btn" class="tap-btn">⚔️<span>TAP</span></button>
+          <div id="combo-meter" class="combo-meter hidden"></div>
+          <div id="skill-row" class="skill-row"></div>
+
+
+          <div class="combat-log" id="combat-log"></div>
+        </div>
+      </section>
+
+      <!-- MINE -->
+      <section id="tab-mine" class="tab">
+        <h2>⛏️ Deepdelve Mine</h2>
+        <p class="muted small" style="margin:0 0 8px">Shatter ore nodes, delve deeper, forge stronger pickaxes.</p>
+        <div id="mine-pickaxe" class="mine-pickaxe"></div>
+        <div id="mine-rock" class="mine-rock"></div>
+        <button id="mine-btn" class="btn tap-btn mine-btn"><span class="mine-emoji">⛏️</span><span>MINE</span></button>
+        <div id="mine-find" class="mine-find muted"></div>
+        <div id="mine-stats" class="mine-stats"></div>
+        <h2>💎 Ore Inventory</h2>
+        <div id="ore-grid" class="ore-grid"></div>
+        <h2>⛏️ Mining Shop</h2>
+        <p class="muted small" style="margin:4px 0">Buy pickaxes with ore + gold. Each tier must be bought in order — stronger picks mine deeper, faster.</p>
+        <div id="mining-shop" class="shop-grid"></div>
+      </section>
+
+      <!-- FISHING -->
+      <section id="tab-fish" class="tab">
+        <h2>🎣 Lake of Whispers</h2>
+        <div class="fish-scene">
+          <div class="fish-sky">
+            <div class="fish-sun"></div>
+            <div class="fish-cloud fish-cloud-1"></div>
+            <div class="fish-cloud fish-cloud-2"></div>
+            <div class="fish-birds">🦅</div>
+          </div>
+          <div class="fish-mountains"></div>
+          <div class="fish-far-trees">
+            <div class="far-tree" style="left:2%;font-size:28px">🌲</div>
+            <div class="far-tree" style="left:8%;font-size:20px;opacity:0.5">🌳</div>
+            <div class="far-tree" style="left:15%;font-size:32px">🌲</div>
+            <div class="far-tree" style="left:22%;font-size:18px;opacity:0.4">🎄</div>
+            <div class="far-tree" style="left:68%;font-size:26px">🌳</div>
+            <div class="far-tree" style="left:75%;font-size:34px">🌲</div>
+            <div class="far-tree" style="left:82%;font-size:20px;opacity:0.5">🎄</div>
+            <div class="far-tree" style="left:90%;font-size:28px">🌲</div>
+            <div class="far-tree" style="left:96%;font-size:22px;opacity:0.6">🌳</div>
+          </div>
+          <div class="fish-hills"></div>
+          <div class="fish-treeline">
+            <div class="fish-tree" style="left:3%">🌲</div>
+            <div class="fish-tree" style="left:10%">🌳</div>
+            <div class="fish-tree" style="left:18%">🌲</div>
+            <div class="fish-tree" style="left:28%">🌳</div>
+            <div class="fish-tree" style="left:65%">🌲</div>
+            <div class="fish-tree" style="left:73%">🌳</div>
+            <div class="fish-tree" style="left:82%">🌲</div>
+            <div class="fish-tree" style="left:90%">🌳</div>
+            <div class="fish-tree" style="left:96%">🌲</div>
+          </div>
+          <div class="fish-meadow"></div>
+          <div class="fish-shore"></div>
+          <div class="fish-water">
+            <div class="fish-jump fish-jump-1">🐟</div>
+            <div class="fish-jump fish-jump-2">🐠</div>
+            <div class="fish-jump fish-jump-3">🐟</div>
+            <div class="fish-ripple"></div>
+            <div class="fish-ripple fish-ripple-2"></div>
+          </div>
+          <div class="fish-dock">
+            <div class="dock-plank"></div>
+            <div class="dock-plank"></div>
+            <div class="dock-plank"></div>
+            <div class="dock-plank"></div>
+            <div class="dock-post dock-post-left"></div>
+            <div class="dock-post dock-post-right"></div>
+            <div class="dock-lantern">🏮</div>
+          </div>
+          <div id="fish-rod" class="fish-rod"><span style="font-size:64px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))">🎣</span></div>
+          <svg id="fish-line-svg" class="fish-line-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="fish-line-path" d="" stroke="#ddd" stroke-width="0.5" fill="none"/>
+          </svg>
+          <div id="fish-bobber" class="fish-bobber hidden">🔴</div>
+          <div id="fish-splash" class="fish-splash hidden">💦</div>
+          <div class="fish-reeds">
+            <div class="reed" style="left:2%">🌾</div>
+            <div class="reed" style="left:95%">🌾</div>
+          </div>
+        </div>
+        <div id="fishing-ui">
+        <p class="muted small" style="margin:0 0 8px">Cast your line and time the strike when the marker hits the green zone!</p>
+        <div id="fish-lake" class="fish-lake">
+          <div id="fish-timing-bar" class="fish-timing-bar hidden">
+            <div id="fish-green-zone" class="fish-green-zone"></div>
+            <div id="fish-marker" class="fish-marker"></div>
+          </div>
+          <div id="fish-status" class="fish-status muted">Tap CAST to begin fishing...</div>
+        </div>
+        <button id="fish-btn" class="btn fish-btn"><span class="fish-emoji">🎣</span> <span id="fish-btn-text">CAST</span></button>
+        <div id="fish-catch" class="fish-catch"></div>
+        <div id="catfish-npc" style="background:linear-gradient(135deg,#1a2a1a,#0d1a0d);border:2px solid #4a7c4a;border-radius:12px;padding:14px;margin:12px 0;display:flex;gap:12px;align-items:center">
+          <div style="font-size:48px">🧓🎣</div>
+          <div style="flex:1">
+            <div style="font-weight:bold;color:#8f8;font-size:16px">Catfish</div>
+            <div style="font-size:12px;color:#888;font-style:italic">Old-timer of the Lake</div>
+            <div id="catfish-dialogue" style="margin-top:8px;font-size:14px;color:#ddd">"Well hey there, young angler! The fish are bitin' today. Go on, cast yer line!"</div>
+            <button class="small" data-fish-action="talk" style="margin-top:8px">💬 Talk</button>
+          </div>
+        </div>
+        <div class="fish-panel">
+          <div class="fish-panel-header">🐟 Fish Collection</div>
+          <div id="fish-grid" class="fish-grid"></div>
+        </div>
+        <div class="fish-panel">
+          <div class="fish-panel-header">🎣 Tackle Shop</div>
+          <p class="muted small" style="margin:4px 0">Better rods = bigger green zone + rarer catches.</p>
+          <div id="fishing-shop" class="shop-grid"></div>
+          <div id="fishing-quests" class="shop-grid" style="margin-top:8px"></div>
+        </div>
+        </div>
+      </section>
+
+      <!-- GEAR -->
+      <section id="tab-gear" class="tab">
+        <h2>Loadout</h2>
+        <div id="loadout-strip" class="loadout-strip"></div>
+        <h2>Upgrades</h2>
+        <div id="upgrade-list" class="upgrade-list"></div>
+        <h2>Inventory <span id="inv-count" class="muted"></span></h2>
+        <div class="inv-actions">
+          <label class="autosell-toggle"><input type="checkbox" id="autosell-checkbox"> <span>💰 Auto-sell loot</span></label>
+        </div>
+        <div id="set-progress" class="set-progress"></div>
+        <div id="inventory-grid" class="inv-grid"></div>
+      </section>
+
+      <!-- ARMORY -->
+      <section id="tab-armory" class="tab">
+        <h2>⚒️ Armory</h2>
+        <p class="muted small">Masterwork class gear, forged for your class. Below, sell your spare gear for gold.</p>
+        <h2>Buy</h2>
+        <div id="armory-stock" class="gear-shop"></div>
+        <h2>Sell for gold</h2>
+        <div class="inv-actions">
+          <button id="clear-bags" class="btn small">🗑️ Sell All</button>
+        </div>
+        <div id="armory-sell" class="armory-sell"></div>
+        <h2>🌌 Galaxy Forge</h2>
+        <div id="forge-section" class="forge-section"></div>
+      </section>
+
+      <!-- TOKEN SHOP -->
+      <section id="tab-tokenshop" class="tab">
+        <div class="row-between">
+          <h2 style="margin:0">🎟️ Token Shop</h2>
+          <span id="token-balance" class="token-balance"></span>
+        </div>
+        <p class="muted" style="margin:6px 0">Earn <b>🎟️ Tokens</b> from raid clears. Stock rotates every 24h — <span id="token-countdown"></span></p>
+        <div id="token-shop-grid" class="shop-grid"></div>
+      </section>
+
+      <!-- PETS -->
+      <section id="tab-pets" class="tab">
+        <div id="pets-section"></div>
+      </section>
+
+      <!-- TALENTS -->
+      <section id="tab-talents" class="tab">
+        <div id="talents-root"></div>
+      </section>
+
+      <!-- PARTY -->
+      <section id="tab-party" class="tab">
+        <div class="row-between">
+          <h2 style="margin:0">🎉 Party</h2>
+          <button id="mp-refresh" class="btn small ghost" title="Refresh party">↻ Refresh</button>
+        </div>
+        <div id="mp-party-card" class="card"></div>
+        <div class="card" id="mp-join-card">
+          <h3>🔗 Join a party</h3>
+          <div class="row">
+            <input id="mp-join-code" class="text-input" placeholder="6-letter code" maxlength="6"
+              autocapitalize="characters" autocomplete="off" spellcheck="false" />
+            <button id="mp-join-btn" class="btn gold">Join</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🛡️ NPC allies</h3>
+          <p class="muted small">Your dungeon party fights beside you in Dungeon mode (up to 3 companions). Each ally also grants <b>+4% XP</b>.</p>
+          <div id="party-synergy" class="hidden"></div>
+        <div id="party-slots" class="party-slots"></div>
+          <h3>Recruit</h3>
+          <div id="recruit-list" class="recruit-list"></div>
+        </div>
+      </section>
+
+      <!-- RANKS -->
+      <section id="tab-ranks" class="tab">
+        <div class="row-between">
+          <h2 style="margin:0">🏆 Leaderboard</h2>
+          <div class="row-gap">
+            <button id="lb-refresh" class="btn small ghost">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="subtabs" id="ranks-subtabs" role="tablist" aria-label="Ranks views">
+          <button class="subtab active" data-subtab="board">🏆 Board</button>
+          <button class="subtab" data-subtab="friends">👥 Friends<span id="friend-req-badge" class="req-badge hidden"></span></button>
+        </div>
+        <div id="lb-board-view">
+          <div class="lb-cats" id="lb-cats" role="tablist" aria-label="Leaderboard category">
+            <button class="lb-cat active" id="lb-cat-heroes" data-lbcat="heroes" role="tab" aria-selected="true">🦸 Heroes</button>
+            <button class="lb-cat" id="lb-cat-guilds" data-lbcat="guilds" role="tab" aria-selected="false">🏰 Guilds</button>
+            <button class="lb-cat active" data-by="level">🎖️ Level</button>
+            <button class="lb-cat" data-by="stage">🗺️ Stage</button>
+            <button class="lb-cat" data-by="bosses">👑 Bosses</button>
+            <button class="lb-cat" data-by="kills">⚔️ Kills</button>
+            <button class="lb-cat" data-by="depth">⛏️ Depth</button>
+          </div>
+          <div class="muted small lb-note" id="lb-note"></div>
+          <div id="lb-me" class="lb-me hidden" role="status"></div>
+          <div class="lb-list" id="lb-body"></div>
+        </div>
+        <div id="friends-panel" class="hidden"></div>
+      </section>
+
+      <!-- GUILD -->
+      <section id="tab-guild" class="tab">
+        <div class="card" id="guild-card">
+          <h3>🏰 Guild</h3>
+          <div id="guild-section"><p class="muted small">Loading…</p></div>
+        </div>
+      </section>
+
+      <!-- QUESTS -->
+      <section id="tab-quests" class="tab">
+        <div class="row-between">
+          <h2 style="margin:0">📜 Quests</h2>
+          <span class="muted small">daily @ UTC midnight · weekly Mon 00:00 UTC</span>
+        </div>
+        <div id="quest-daily"></div>
+        <div id="quest-weekly"></div>
+        <div id="quest-guide"></div>
+        <div id="quest-class"></div>
+        <div id="quest-mastery"></div>
+      </section>
+
+      <!-- STATS -->
+      <section id="tab-stats" class="tab">
+        <div id="stats-card" class="card"></div>
+      </section>
+
+
+      <!-- INN (AFK safe zone) -->
+      <section id="tab-inn" class="tab">
+        <div class="inn-scene">
+          <img class="inn-bg" src="img/inn-bg.webp" alt="Warm tavern interior on a stormy night">
+          <canvas id="inn-glow" aria-hidden="true"></canvas>
+          <div class="inn-panel">
+            <h2>🏠 The Shadowed Hearth</h2>
+            <p class="muted small">Safe from the storm — and everything else. Rest here as long as you like; nothing can hurt you.</p>
+            <div class="bar hp"><div class="fill" id="inn-hpfill"></div><span class="bar-text" id="inn-hptext"></span></div>
+            <div id="inn-status" class="inn-status">💤 Resting…</div>
+            <button id="leave-inn-btn" class="btn gold wide" type="button">⚔️ Leave Inn</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MORE -->
+      <section id="tab-settings" class="tab">
+        <div class="card" id="account-card">
+          <h3>👤 Account</h3>
+          <p class="muted small" id="account-current"></p>
+          <div id="acct-forms">
+            <div class="acct-section">
+              <h4>🔑 Change password</h4>
+              <input type="password" id="acct-cur-pass" class="friend-input acct-input" placeholder="Current password" autocomplete="current-password">
+              <input type="password" id="acct-new-pass" class="friend-input acct-input" placeholder="New password (min 8 chars)" autocomplete="new-password">
+              <input type="password" id="acct-new-pass2" class="friend-input acct-input" placeholder="Confirm new password" autocomplete="new-password">
+              <button id="acct-pass-btn" class="btn gold wide">Change password</button>
+            </div>
+            <div class="acct-section">
+              <h4>✏️ Change username</h4>
+              <input id="acct-new-username" class="friend-input acct-input" placeholder="New username (3–20: A–Z, 0–9, _)" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false">
+              <input type="password" id="acct-username-pass" class="friend-input acct-input" placeholder="Current password to confirm" autocomplete="current-password">
+              <button id="acct-username-btn" class="btn gold wide">Change username</button>
+              <p class="muted tiny">Renames you everywhere — guild, friends, leaderboard. Progress, items, and hero name are untouched.</p>
+            </div>
+          </div>
+          <button id="logout-btn" class="btn danger wide">Logout</button>
+        </div>
+        <div id="profile-card" class="card"></div>
+        <div class="card hidden" id="guest-upgrade-card">
+          <h3>💾 Keep your progress</h3>
+          <p class="muted small">You're playing as a guest — your hero only exists on this device. Create a free account to save online, join guilds, and appear on the leaderboard.</p>
+          <button id="guest-upgrade-btn" class="btn gold wide">✨ Create account</button>
+        </div>
+        <div class="card">
+          <h3>📣 Share the game</h3>
+          <p class="muted small">Brag your stats, invite friends, or grab the link for your videos.</p>
+          <button id="share-btn" class="btn gold wide">📣 Share Throne of Shadows</button>
+        </div>
+        <div class="card">
+          <h3>📜 Game logs</h3>
+          <div class="row">
+            <button id="changelog-btn" class="btn wide">📰 What's New <span id="changelog-badge" class="new-badge hidden">NEW</span></button>
+            <button id="balance-log-btn" class="btn wide">⚖️ Balance Log <span id="balance-log-badge" class="new-badge hidden">NEW</span></button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🎁 Redeem gift code</h3>
+          <div class="row">
+            <input id="redeem-input" placeholder="XXXX-XXXX-XXXX" autocomplete="off"
+                   autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
+            <button id="redeem-btn" class="btn">Redeem</button>
+          </div>
+        </div>
+        <div class="card hidden" id="gm-entry-card">
+          <h3>🛠️ Staff</h3>
+          <button id="gm-open-btn" class="btn wide">Open GM Console</button>
+        </div>
+        <div class="card">
+          <h3>⚙️ Settings</h3>
+          <label class="setting"><input type="checkbox" id="set-dmgnums"> Damage numbers</label>
+          <label class="setting"><input type="checkbox" id="set-motion"> Reduce motion</label>
+          <label class="setting"><input type="checkbox" id="set-sfx"> Sound FX</label>
+          <label class="setting"><input type="checkbox" id="set-music"> Music <span class="muted small">(ambient)</span></label>
+          <label class="setting"><input type="checkbox" id="set-perf"> Performance mode <span class="muted small">(anti-lag)</span></label>
+          <div class="setting-row">
+            <span class="setting-label">🎬 Background frame rate</span>
+            <div class="seg-control" id="bg-fps-seg" role="group" aria-label="Background frame rate">
+              <button type="button" data-bgfps="30">30 FPS</button>
+              <button type="button" data-bgfps="60">60 FPS</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">🖼️ Background detail</span>
+            <div class="seg-control" id="bg-hd-seg" role="group" aria-label="Background detail">
+              <button type="button" data-bghd="0">SD</button>
+              <button type="button" data-bghd="1">HD</button>
+            </div>
+          </div>
+          <div class="setting-row" id="music-track-row">
+            <span class="setting-label">🎼 Music track</span>
+            <select id="set-music-track" class="country-select" aria-label="Music track"></select>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">🎚️ Music volume</span>
+            <input type="range" id="set-music-vol" min="0" max="100" value="50" aria-label="Music volume">
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">🎚️ SFX volume</span>
+            <input type="range" id="set-sfx-vol" min="0" max="100" value="50" aria-label="SFX volume">
+          </div>
+          <label class="setting"><input type="checkbox" id="set-combat-music" checked> Boss-fight music <span class="muted small">(Dread Sovereign)</span></label>
+          <label class="setting"><input type="checkbox" id="set-follow-world" checked> Worlds change the music <span class="muted small">(Void Hymn in deep worlds)</span></label>
+          <div class="setting-row" style="margin-top:0.55rem">
+            <span class="setting-label">🔔 Notifications</span>
+          </div>
+          <label class="setting"><input type="checkbox" id="set-notif-level" checked> Level-up toasts</label>
+          <label class="setting"><input type="checkbox" id="set-notif-death" checked> Death toasts</label>
+          <label class="setting"><input type="checkbox" id="set-notif-loot" checked> Loot-drop toasts</label>
+          <label class="setting"><input type="checkbox" id="set-notif-quest" checked> Quest-complete toasts</label>
+          <div class="setting-row">
+            <span class="setting-label">UI style</span>
+            <div class="seg-control" id="ui-style-seg" role="group" aria-label="UI style">
+              <button type="button" data-uistyle="classic">Classic</button>
+              <button type="button" data-uistyle="modern">Modern</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Buttons</span>
+            <div class="swatch-grid" id="btn-style-picker" role="group" aria-label="Button style"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Background</span>
+            <div class="swatch-grid" id="bg-style-picker" role="group" aria-label="Background style"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">⚔️ Battle background</span>
+            <div class="opt-cards" id="battle-bg-picker" role="radiogroup" aria-label="Battle background"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">✨ Name style</span>
+            <div class="swatch-grid" id="name-color-picker" role="group" aria-label="Name color"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Custom color</span>
+            <input type="color" id="name-color-custom" class="color-input" value="#ffd76a" aria-label="Custom name color">
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Name effect</span>
+            <div class="fx-grid" id="name-fx-picker" role="group" aria-label="Name effect"></div>
+          </div>
+          <div class="setting-row hidden" id="bg-anim-row">
+            <span class="setting-label" id="bg-anim-label">Scene options</span>
+            <div id="bg-anim-opts"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🌍 Immersion</h3>
+          <div class="setting-row">
+            <span class="setting-label">🌦️ Atmosphere</span>
+            <select id="set-atmosphere" class="country-select" aria-label="Atmosphere">
+              <option value="clear">Clear skies</option>
+              <option value="rain">Rain</option>
+              <option value="fog">Fog</option>
+              <option value="ash">Drifting ash</option>
+            </select>
+          </div>
+          <label class="setting"><input type="checkbox" id="set-weathersync"> Sync real weather <span class="muted small">(uses your location)</span></label>
+          <div class="setting-row">
+            <span class="setting-label">🎨 Graphics quality</span>
+            <div class="seg-control" id="gfx-seg" role="group" aria-label="Graphics quality">
+              <button type="button" data-gfx="sd">SD</button>
+              <button type="button" data-gfx="hd">HD</button>
+              <button type="button" data-gfx="4k">4K</button>
+            </div>
+          </div>
+          <p class="muted small">Night palette and seasonal tints follow your device clock automatically.</p>
+        </div>
+        <a href="/report.html" class="btn wide" style="margin-bottom:0.5rem">🐞 Report a bug / 💬 Feedback</a>
+        <a href="https://discord.gg/qVPkJbEDzu" target="_blank" rel="noopener" class="btn wide" style="margin-bottom:0.5rem">💬 Feedback on Discord</a>
+      </section>
+    </main>
+
+    <nav id="tabbar">
+      <button class="tab-btn" id="character-open"><span class="ticon">👤</span><span>Character</span></button>
+      <button class="tab-btn active" data-tab="battle"><span class="ticon">⚔️</span><span>Battle</span></button>
+      <button class="tab-btn" id="spellbook-open"><span class="ticon">📖</span><span>Spells</span></button>
+      <button class="tab-btn" data-tab="mine"><span class="ticon">⛏️</span><span>Mine</span></button>
+      <button class="tab-btn" data-tab="fish" disabled style="opacity:0.4"><span class="ticon">🎣</span><span>Fish 🔒</span></button>
+      <button class="tab-btn" data-tab="gear"><span class="ticon">🎒</span><span>Inventory</span></button>
+      <button class="tab-btn" data-tab="armory"><span class="ticon">⚒️</span><span>Armory</span></button>
+      <button class="tab-btn" data-tab="tokenshop"><span class="ticon">🌀</span><span>Token Shop</span></button>
+      <button class="tab-btn" data-tab="pets"><span class="ticon">🐾</span><span>Pets</span></button>
+      <button class="tab-btn" data-tab="party"><span class="ticon">👥</span><span>Party</span></button>
+      <button class="tab-btn" data-tab="ranks"><span class="ticon">🏆</span><span>Ranks</span></button>
+      <button class="tab-btn" data-tab="guild"><span class="ticon">🏰</span><span>Guild</span></button>
+      <button class="tab-btn" data-tab="quests"><span class="ticon">📜</span><span>Quests</span></button>
+      <button class="tab-btn" data-tab="talents"><span class="ticon">🌳</span><span>Talents</span></button>
+      <button class="tab-btn" data-tab="stats"><span class="ticon">📊</span><span>Stats</span></button>
+      <button class="tab-btn" data-tab="settings"><span class="ticon">⚙️</span><span>Settings</span></button>
+      <button class="tab-btn" id="realm-open"><span class="ticon">🌐</span><span>Realm</span></button>
+      <button class="tab-btn hidden" data-tab="staff" id="tabbtn-staff"><span class="ticon">🛠️</span><span>Staff</span></button>
+    </nav>
+  </section>
+
+  <!-- ============ GM CONSOLE ============ -->
+  <section id="view-gm" class="view hidden">
+    <header class="gm-header">
+      <button id="gm-back" class="btn small ghost">← Back</button>
+      <h2>🛠️ GM Console</h2>
+    </header>
+    <div id="gm-content" class="gm-content"></div>
+  </section>
+
+</div>
+
+<div id="modal-root"></div>
+<div id="gm-rainbow-frame"></div>
+<div id="toast-root"></div>
+
+<script type="module" src="js/app.js?v20261003bk"></script>
+<script type="module" src="js/gamepad.js?v=20260930ar"></script>
+</body>
+</html>

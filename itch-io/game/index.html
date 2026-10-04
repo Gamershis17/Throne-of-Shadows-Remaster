@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12101a">
+  <title>King of Project</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ AUTH ============ -->
+  <section id="view-auth" class="view">
+    <div class="auth-wrap">
+      <div class="logo">⚔️</div>
+      <h1>King of Project</h1>
+      <p class="tagline">An idle dungeon crawler. Tap, loot, prestige.</p>
+      <div class="auth-tabs">
+        <button id="auth-tab-login" class="auth-tab active" type="button">Login</button>
+        <button id="auth-tab-register" class="auth-tab" type="button">Register</button>
+      </div>
+      <form id="login-form" class="auth-form" autocomplete="on">
+        <input id="login-username" placeholder="Username" autocomplete="username" maxlength="20">
+        <input id="login-password" type="password" placeholder="Password" autocomplete="current-password">
+        <button type="submit" class="btn gold">⚔️ Login</button>
+      </form>
+      <form id="register-form" class="auth-form hidden" autocomplete="on">
+        <input id="reg-username" placeholder="Username (3–20, letters/numbers/_)" autocomplete="username" maxlength="20">
+        <input id="reg-password" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+        <input id="reg-password2" type="password" placeholder="Confirm password" autocomplete="new-password">
+        <button type="submit" class="btn gold">✨ Create hero</button>
+      </form>
+      <div id="auth-error" class="auth-error hidden"></div>
+    </div>
+  </section>
+
+  <!-- ============ RACE SELECT (first run) ============ -->
+  <section id="view-race" class="view hidden">
+    <div class="race-wrap">
+      <h1>Choose your race</h1>
+      <p class="muted">This shapes your hero's destiny — choose wisely.</p>
+      <div id="race-grid" class="race-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ MAIN APP ============ -->
+  <section id="view-app" class="view hidden">
+    <header id="hud">
+      <div class="hud-row">
+        <div class="hud-id">
+          <span id="hud-emoji">🛡️</span>
+          <div>
+            <div id="hud-username">—</div>
+            <div id="hud-sub"><span id="hud-role" class="role-badge">player</span><span id="hud-race" class="muted"></span></div>
+          </div>
+        </div>
+        <div class="hud-currencies">
+          <div>💰 <span id="hud-gold">0</span></div>
+          <div>⭐ <span id="hud-stars">0</span></div>
+          <div>🗺️ <span id="hud-stage">1</span></div>
+        </div>
+      </div>
+      <div class="hud-row">
+        <div class="hud-level">Lv <span id="hud-level">1</span></div>
+        <div class="bar xp"><div class="fill" id="hud-xpfill"></div><span class="bar-text" id="hud-xptext"></span></div>
+      </div>
+      <div class="hud-row save-row"><span id="save-indicator" class="save-ind">● saved</span></div>
+    </header>
+
+    <main id="tab-content">
+      <!-- BATTLE -->
+      <section id="tab-battle" class="tab active">
+        <div class="mode-switch" id="mode-switch">
+          <button class="mode-btn" data-mode="clicker">👆<span>Clicker</span></button>
+          <button class="mode-btn" data-mode="auto">🤖<span>Auto</span></button>
+          <button class="mode-btn" data-mode="dungeon">🏰<span>Dungeon</span></button>
+        </div>
+
+        <div>
+          <div class="enemy-card" id="enemy-card">
+            <div class="enemy-top">
+              <div class="enemy-sprite" id="enemy-sprite">🐺</div>
+              <div class="enemy-info">
+                <div class="enemy-name" id="enemy-name">—</div>
+                <div class="enemy-stage" id="enemy-stage">Stage 1</div>
+              </div>
+              <div class="boss-badge hidden" id="boss-badge">BOSS</div>
+            </div>
+            <div class="bar hp enemy-hp"><div class="fill" id="enemy-hpfill"></div><span class="bar-text" id="enemy-hptext"></span></div>
+            <div class="enemy-atk" id="enemy-atk"></div>
+            <div class="float-layer" id="float-layer"></div>
+            <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
+          </div>
+
+          <div class="hero-panel">
+            <div class="bar hp"><div class="fill" id="hero-hpfill"></div><span class="bar-text" id="hero-hptext"></span></div>
+            <div class="hero-stats" id="hero-stats"></div>
+            <div class="party-chips hidden" id="dungeon-chips"></div>
+          </div>
+        </div>
+
+        <div>
+          <button id="tap-btn" class="tap-btn">⚔️<span>TAP</span></button>
+          <div id="combo-meter" class="combo-meter hidden"></div>
+          <button id="skill-btn" class="skill-btn">✨ Power Strike <span id="skill-cd"></span></button>
+
+          <div id="prestige-box" class="prestige-box hidden">
+            <button id="prestige-btn" class="btn gold">🔥 Prestige (Stage 50+)</button>
+            <div class="prestige-note" id="prestige-note"></div>
+          </div>
+
+          <div class="combat-log" id="combat-log"></div>
+        </div>
+      </section>
+
+      <!-- GEAR -->
+      <section id="tab-gear" class="tab">
+        <h2>Upgrades</h2>
+        <div id="upgrade-list" class="upgrade-list"></div>
+        <h2>Inventory <span id="inv-count" class="muted"></span></h2>
+        <div id="inventory-grid" class="inv-grid"></div>
+      </section>
+
+      <!-- PARTY -->
+      <section id="tab-party" class="tab">
+        <p class="muted">Your dungeon party fights beside you in Dungeon mode (up to 3 companions).</p>
+        <div id="party-slots" class="party-slots"></div>
+        <h2>Recruit</h2>
+        <div id="recruit-list" class="recruit-list"></div>
+      </section>
+
+      <!-- RANKS -->
+      <section id="tab-ranks" class="tab">
+        <div class="row-between">
+          <h2 style="margin:0">🏆 Leaderboard</h2>
+          <button id="lb-refresh" class="btn small ghost">↻ Refresh</button>
+        </div>
+        <table class="lb-table">
+          <thead><tr><th>#</th><th>Hero</th><th>Lv</th><th>Stage</th><th>⚔️</th><th>👹</th><th>🔥</th></tr></thead>
+          <tbody id="lb-body"></tbody>
+        </table>
+      </section>
+
+      <!-- MORE -->
+      <section id="tab-more" class="tab">
+        <div id="profile-card" class="card"></div>
+        <div class="card">
+          <h3>🎁 Redeem gift code</h3>
+          <div class="row">
+            <input id="redeem-input" placeholder="XXXX-XXXX-XXXX" autocomplete="off"
+                   autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
+            <button id="redeem-btn" class="btn">Redeem</button>
+          </div>
+        </div>
+        <div class="card hidden" id="gm-entry-card">
+          <h3>🛠️ Staff</h3>
+          <button id="gm-open-btn" class="btn wide">Open GM Console</button>
+        </div>
+        <div class="card">
+          <h3>⚙️ Settings</h3>
+          <label class="setting"><input type="checkbox" id="set-dmgnums"> Damage numbers</label>
+          <label class="setting"><input type="checkbox" id="set-motion"> Reduce motion</label>
+        </div>
+        <button id="logout-btn" class="btn danger wide">Logout</button>
+      </section>
+    </main>
+
+    <nav id="tabbar">
+      <button class="tab-btn active" data-tab="battle"><span class="ticon">⚔️</span><span>Battle</span></button>
+      <button class="tab-btn" data-tab="gear"><span class="ticon">🎒</span><span>Gear</span></button>
+      <button class="tab-btn" data-tab="party"><span class="ticon">👥</span><span>Party</span></button>
+      <button class="tab-btn" data-tab="ranks"><span class="ticon">🏆</span><span>Ranks</span></button>
+      <button class="tab-btn" data-tab="more"><span class="ticon">⋯</span><span>More</span></button>
+    </nav>
+  </section>
+
+  <!-- ============ GM CONSOLE ============ -->
+  <section id="view-gm" class="view hidden">
+    <header class="gm-header">
+      <button id="gm-back" class="btn small ghost">← Back</button>
+      <h2>🛠️ GM Console</h2>
+    </header>
+    <div id="gm-content" class="gm-content"></div>
+  </section>
+
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

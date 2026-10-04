@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Throne of Shadows — UWP package manifest template (Xbox sideloading).
+     Copy to Package.appxmanifest in the Visual Studio UWP project, then
+     replace every YOUR_* placeholder. See xbox/uwp/BUILD.md. -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="YOUR_PACKAGE_NAME"
+    Publisher="YOUR_PUBLISHER_ID"
+    Version="1.0.0.0"
+    ProcessorArchitecture="x64" />
+
+  <mp:PhoneIdentity PhoneProductId="YOUR_GUID" PhonePublisherId="YOUR_GUID" />
+
+  <Properties>
+    <DisplayName>Throne of Shadows</DisplayName>
+    <PublisherDisplayName>YOUR_PUBLISHER_DISPLAY_NAME</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal"
+                        MinVersion="10.0.18362.0"
+                        MaxVersionTested="10.0.22621.0" />
+    <PackageDependency Name="Microsoft.UI.Xaml.2.8"
+                       MinVersion="2.8.0.0"
+                       Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="$targetnametoken$.exe"
+                 EntryPoint="ThroneOfShadows.App">
+      <uap:VisualElements
+        DisplayName="Throne of Shadows"
+        Description="Throne of Shadows — dark-fantasy idle RPG"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- WebView2 needs outbound network to reach the live game server. -->
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>

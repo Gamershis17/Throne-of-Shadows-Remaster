@@ -1,0 +1,24 @@
+<Page
+    x:Class="ThroneOfShadows.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    Background="Black">
+
+    <!-- Full-screen WebView2 (WinUI 2) hosting the live game.
+         The game itself handles controller input via public/js/gamepad.js,
+         so no native input code is needed here. -->
+    <Grid>
+        <muxc:WebView2 x:Name="GameView"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch" />
+        <TextBlock x:Name="ErrorText"
+                   Visibility="Collapsed"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="LightGray"
+                   FontSize="18"
+                   Margin="48" />
+    </Grid>
+</Page>

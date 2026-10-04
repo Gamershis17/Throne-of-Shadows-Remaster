@@ -1,0 +1,42 @@
+# Render Blueprint for Throne of Shadows
+# Deploy via Render dashboard: New → Blueprint → point it at this repo.
+services:
+  - type: web
+    name: throne-of-shadows
+    runtime: docker          # builds the Dockerfile in this folder
+    plan: free
+    healthCheckPath: /api/leaderboard
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: OWNER_USERNAME
+        value: ""
+        description: "REQUIRED — Login username for the owner account. Type
+          gamershis17 (you sign in with this name on the game's login screen)."
+      - key: OWNER_PASSWORD
+        value: ""
+        description: "REQUIRED — Pick a secret password for the owner account.
+          Only you will know it."
+      - key: DATABASE_URL
+        value: ""
+        description: "REQUIRED — PostgreSQL connection string. This is what keeps
+          accounts, saves and the leaderboard alive across restarts. Paste your
+          Neon connection string here (it starts with postgres://). SSL is
+          enabled automatically for non-localhost hosts."
+
+    # --- Persistence ---
+    # All accounts, saves, sessions, gift codes and the leaderboard now live in
+    # PostgreSQL via DATABASE_URL (above) — NOT on the local disk. That is what
+    # makes progress survive restarts, redeploys and sleep/wake cycles on the
+    # free plan.
+    #
+    # WARNING: Render's free-tier filesystem is still EPHEMERAL. Do not store
+    # anything you need to keep on the local disk — anything written outside
+    # Postgres is wiped on every restart/redeploy/sleep-wake.
+    #
+    # The old SQLite implementation is preserved as a fallback in
+    # sqlite-legacy/ (see its README), but the live server no longer uses it.
