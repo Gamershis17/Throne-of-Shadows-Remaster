@@ -54,7 +54,7 @@ export function xpForLevel(level) {
 // Create a new hero
 export function createHero(name, classId) {
   const cls = CLASSES[classId] || CLASSES.warrior;
-  return {
+  const hero = {
     name, classId,
     level: 1, xp: 0,
     gold: 0,
@@ -62,6 +62,30 @@ export function createHero(name, classId) {
     gear: { weapon: null, armor: null, trinket: null },
     inventory: [],
   };
+  // Hunter starts with 1 pet — simple companion, no complex system
+  if (classId === 'hunter') {
+    hero.pet = { name: 'Wolf', emoji: '🐺', loyalty: 100, level: 1 };
+  }
+  return hero;
+}
+
+// Pet attacks — damage scales with loyalty
+export function petAttack(hero, enemy) {
+  if (!hero.pet || hero.pet.loyalty <= 0) return null;
+  const loyaltyMult = 0.5 + (hero.pet.loyalty / 100) * 0.5;
+  const dmg = Math.max(1, Math.floor(hero.level * 2 * loyaltyMult));
+  enemy.hp = Math.max(0, enemy.hp - dmg);
+  return { damage: dmg, killed: enemy.hp <= 0 };
+}
+
+// Feed pet — restores loyalty (costs gold)
+export function feedPet(hero) {
+  if (!hero.pet) return false;
+  const cost = 10 * hero.level;
+  if (hero.gold < cost) return false;
+  hero.gold -= cost;
+  hero.pet.loyalty = Math.min(100, hero.pet.loyalty + 25);
+  return true;
 }
 
 // Calculate hero stats from level + gear
@@ -160,6 +184,46 @@ export function rollGearDrop(stage, isBoss) {
   };
   return item;
 }
+
+// Spells — each class gets unique abilities
+export const SPELLS = {
+  warrior: [
+    { id: 'slash', name: 'Power Slash', emoji: '⚔️', desc: 'Heavy strike: 200% damage', mana: 10, mult: 2.0, cd: 5 },
+    { id: 'shield', name: 'Shield Wall', emoji: '🛡️', desc: 'Block: take 50% less damage for 10s', mana: 15, cd: 15 },
+  ],
+  mage: [
+    { id: 'fireball', name: 'Fireball', emoji: '🔥', desc: 'Explosive: 250% damage', mana: 15, mult: 2.5, cd: 6 },
+    { id: 'frost', name: 'Frost Nova', emoji: '❄️', desc: 'Freeze: enemy skips 1 attack', mana: 12, cd: 12 },
+  ],
+  hunter: [
+    { id: 'aimed', name: 'Aimed Shot', emoji: '🎯', desc: 'Precise: 220% damage, always crits', mana: 12, mult: 2.2, cd: 6, alwaysCrit: true },
+    { id: 'mend', name: 'Mend Pet', emoji: '💚', desc: 'Heal pet loyalty + feed', mana: 8, cd: 10 },
+  ],
+};
+
+// Cast a spell — returns result
+export function castSpell(hero, spellId, enemy, heroHp, maxHp) {
+  const spells = SPELLS[hero.classId] || [];
+  const spell = spells.find(s => s.id === spellId);
+  if (!spell) return null;
+  // TODO: mana/cooldown tracking in game.js
+  const stats = heroStats(hero);
+  let damage = 0;
+  let healing = 0;
+  if (spell.mult) {
+    const isCrit = spell.alwaysCrit || Math.random() < stats.critChance;
+    damage = Math.max(1, Math.floor(stats.atk * spell.mult * (isCrit ? stats.critMult : 1)));
+    enemy.hp = Math.max(0, enemy.hp - damage);
+  }
+  return { spell, damage, healing, killed: enemy.hp <= 0 };
+}
+
+// Dungeons — special multi-wave challenges
+export const DUNGEONS = [
+  { id: 'crypt', name: 'Shadow Crypt', emoji: '🪦', waves: 5, unlockStage: 10, desc: 'Undead lurk in the dark.' },
+  { id: 'cavern', name: 'Ember Cavern', emoji: '🌋', waves: 8, unlockStage: 25, desc: 'Fire and stone.' },
+  { id: 'abyss', name: 'Void Abyss', emoji: '🕳️', waves: 12, unlockStage: 50, desc: 'The darkness stares back.' },
+];
 
 // Compare gear — returns true if new item is better for its slot
 export function isUpgrade(hero, item) {

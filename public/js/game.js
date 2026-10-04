@@ -59,9 +59,59 @@ $('start-btn').onclick = async () => {
 function startBattle() {
   enemy = Engine.makeEnemy(hero.stage);
   renderEnemy();
+  renderSpells();
+  renderPet();
   updateHUD();
   startAutoAttack();
 }
+
+function renderSpells() {
+  const bar = $('spell-bar');
+  bar.innerHTML = '';
+  const spells = Engine.SPELLS[hero.classId] || [];
+  for (const spell of spells) {
+    const btn = document.createElement('button');
+    btn.className = 'spell-btn';
+    btn.innerHTML = `${spell.emoji}<span>${spell.name}</span>`;
+    btn.title = spell.desc;
+    btn.onclick = () => {
+      const result = Engine.castSpell(hero, spell.id, enemy, heroHp, Engine.heroStats(hero).hp);
+      if (!result) return;
+      if (result.damage > 0) {
+        floatText(`${spell.emoji} ${result.damage}`, 'crit', false);
+        updateEnemyBar();
+        if (result.killed) onKill();
+      }
+      if (spell.id === 'mend' && hero.pet) {
+        Engine.feedPet(hero);
+        renderPet();
+        toast('💚 Pet fed and happy!');
+      }
+    };
+    bar.appendChild(btn);
+  }
+}
+
+function renderPet() {
+  const bar = $('pet-bar');
+  if (!hero.pet) {
+    bar.classList.add('hidden');
+    return;
+  }
+  bar.classList.remove('hidden');
+  $('pet-emoji').textContent = hero.pet.emoji;
+  $('pet-loyalty').textContent = `Loyalty ${hero.pet.loyalty}%`;
+}
+
+$('feed-btn') && ($('feed-btn').onclick = () => {
+  if (Engine.feedPet(hero)) {
+    renderPet();
+    updateHUD();
+    toast('🍖 Pet fed! Loyalty up.');
+  } else {
+    toast('Not enough gold to feed!');
+  }
+});
 
 function renderEnemy() {
   $('enemy-emoji').textContent = enemy.emoji;
@@ -170,6 +220,23 @@ function doAttack() {
   if (!enemy || enemy.hp <= 0) return;
   const result = Engine.playerAttack(hero, enemy);
   floatText(result.crit ? `💥 ${result.damage}!` : result.damage, result.crit ? 'crit' : 'normal', false);
+
+  // Hunter pet attacks too
+  if (hero.pet && !result.killed) {
+    const petResult = Engine.petAttack(hero, enemy);
+    if (petResult) {
+      floatText(`🐾 ${petResult.damage}`, 'normal', false);
+      // Loyalty drains slowly
+      hero.pet.loyalty = Math.max(0, hero.pet.loyalty - 1);
+      renderPet();
+      if (petResult.killed) {
+        updateEnemyBar();
+        onKill();
+        return;
+      }
+    }
+  }
+
   updateEnemyBar();
 
   if (result.killed) {
