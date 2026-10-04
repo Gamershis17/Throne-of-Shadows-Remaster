@@ -5,7 +5,7 @@ services:
     name: throne-of-shadows
     runtime: docker          # builds the Dockerfile in this folder
     plan: free
-    healthCheckPath: /api/leaderboard
+    healthCheckPath: /api/status
     envVars:
       - key: PORT
         value: 3000
