@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
   <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004d">
+  <link rel="stylesheet" href="css/style.css?v20261004e">
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -388,6 +388,64 @@
       </section>
 
       <!-- MORE -->
+      <section id="tab-settings" class="tab">
+        <div class="card">
+          <h2>⚙️ Settings</h2>
+          
+          <h3>🎵 Music</h3>
+          <div class="setting-row">
+            <label class="setting">
+              <input type="checkbox" id="set-music"> Music
+              <span class="muted small">(ambient tracks)</span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <label class="setting">Music volume</label>
+            <input type="range" id="set-music-vol" min="0" max="100" value="50">
+          </div>
+          <div class="setting-row">
+            <label class="setting">Track</label>
+            <select id="set-music-track">
+              <option value="shadow-requiem">Shadow Requiem</option>
+              <option value="void-hymn">Void Hymn</option>
+              <option value="ember-tavern">Ember Tavern</option>
+              <option value="war-horns">War Horns</option>
+              <option value="frostfall">Frostfall</option>
+            </select>
+          </div>
+
+          <h3>🔊 Sound FX</h3>
+          <div class="setting-row">
+            <label class="setting">
+              <input type="checkbox" id="set-sfx"> Sound effects
+            </label>
+          </div>
+          <div class="setting-row">
+            <label class="setting">SFX volume</label>
+            <input type="range" id="set-sfx-vol" min="0" max="100" value="50">
+          </div>
+
+          <h3>🎨 UI Style</h3>
+          <div class="setting-row">
+            <label class="setting">Interface style</label>
+            <select id="set-ui-style">
+              <option value="classic" selected>Classic</option>
+              <option value="modern">Modern</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label class="setting">
+              <input type="checkbox" id="set-perf"> Performance mode
+              <span class="muted small">(disables animations)</span>
+            </label>
+          </div>
+
+          <h3>👤 Account</h3>
+          <div class="setting-row">
+            <button id="logout-btn" class="btn danger wide">🚪 Log Out</button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <nav id="tabbar">
@@ -404,6 +462,7 @@
       <button class="tab-btn" data-tab="quests"><span class="ticon">📜</span><span>Quests</span></button>
       <button class="tab-btn" data-tab="talents"><span class="ticon">🌳</span><span>Talents</span></button>
       <button class="tab-btn" data-tab="stats"><span class="ticon">📊</span><span>Stats</span></button>
+      <button class="tab-btn" data-tab="settings"><span class="ticon">⚙️</span><span>Settings</span></button>
       <button class="tab-btn" id="realm-open"><span class="ticon">🌐</span><span>Realm</span></button>
       <button class="tab-btn hidden" data-tab="staff" id="tabbtn-staff"><span class="ticon">🛠️</span><span>Staff</span></button>
     </nav>
@@ -417,7 +476,7 @@
 <div id="gm-rainbow-frame"></div>
 <div id="toast-root"></div>
 
-<script type="module" src="js/app.js?v20261004d"></script>
+<script type="module" src="js/app.js?v20261004e"></script>
 <script type="module" src="js/gamepad.js?v=20260930ar"></script>
 </body>
 </html>

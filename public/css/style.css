@@ -7065,3 +7065,71 @@ body.theme-gothic-manor .panel, body.theme-gothic-manor .card {
     height: 90px;
   }
 }
+
+/* --- UI Style: Classic (default) --- */
+body[data-uistyle="classic"] .card {
+  border-radius: 8px;
+  border: 1px solid rgba(212, 160, 23, 0.3);
+}
+
+body[data-uistyle="classic"] .btn {
+  border-radius: 6px;
+  font-family: Georgia, serif;
+}
+
+/* --- UI Style: Modern --- */
+body[data-uistyle="modern"] .card {
+  border-radius: 16px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+body[data-uistyle="modern"] .btn {
+  border-radius: 12px;
+  font-family: -apple-system, sans-serif;
+}
+
+/* --- Settings layout --- */
+#tab-settings .card {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#tab-settings h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: #ffd23f;
+  font-size: 16px;
+}
+
+.setting-row {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-row label.setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.setting-row input[type="range"] {
+  flex: 1;
+  max-width: 200px;
+}
+
+.setting-row select {
+  background: #1a1626;
+  color: #e8e4f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.btn.danger {
+  background: linear-gradient(180deg, #5c2d2d 0%, #3d1d1d 100%);
+  border-color: rgba(255, 91, 91, 0.4);
+  color: #ff8a8a;
+}

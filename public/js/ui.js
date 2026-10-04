@@ -265,7 +265,7 @@ export const UI = {
 
     // Swipe gestures for mobile tab navigation
     (() => {
-      const tabOrder = ['battle', 'mine', 'gear', 'armory', 'pets', 'party', 'ranks', 'guild', 'quests', 'talents', 'stats'];
+      const tabOrder = ['battle', 'mine', 'gear', 'armory', 'pets', 'party', 'ranks', 'guild', 'quests', 'talents', 'stats', 'settings'];
       let touchStartX = 0;
       let touchStartY = 0;
       let touchStartTime = 0;
@@ -708,6 +708,11 @@ export const UI = {
       if (this._bg && this._bg.scene) this.setBgScene(this._bg.scene, this._bg.opts);
     });
     if (this.els['set-perf']) this.els['set-perf'].checked = !!this.settings.performanceMode;
+    try {
+      const savedStyle = localStorage.getItem('tos_remaster_uistyle') || 'classic';
+      document.body.dataset.uistyle = savedStyle;
+      if (this.els['set-ui-style']) this.els['set-ui-style'].value = savedStyle;
+    } catch {}
     listen('set-perf', 'change', (e) => {
       this.saveSetting('performanceMode', e.target.checked);
       this.applyPerfMode();
@@ -732,6 +737,10 @@ export const UI = {
     // Independent volume sliders: live 'input' so the change is audible
     // while dragging; guarded the same as the other audio controls.
     listen('set-music-vol', 'input', (e) => this.handlers.onMusicVolume && this.handlers.onMusicVolume(e.target.value / 100));
+    listen('set-ui-style', 'change', (e) => {
+      document.body.dataset.uistyle = e.target.value;
+      try { localStorage.setItem('tos_remaster_uistyle', e.target.value); } catch {}
+    });
     listen('set-sfx-vol', 'input', (e) => this.handlers.onSfxVolume && this.handlers.onSfxVolume(e.target.value / 100));
     // Notification toggles (Settings → Notifications): delegate to the app,
     // which persists them on the game state save.
