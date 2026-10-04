@@ -26,10 +26,11 @@ async function initDb() {
     `);
     console.log('Database ready');
   } catch (e) {
-    console.error('DB init failed:', e.message);
+    console.error('DB init failed (non-fatal):', e.message);
   }
 }
-initDb();
+// Non-blocking, never crashes startup
+initDb().catch(e => console.error('DB init error (non-fatal):', e.message));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
