@@ -313,6 +313,10 @@ function doAttack() {
     // Enemy counterattacks
     setTimeout(() => {
       if (!enemy || enemy.hp <= 0) return;
+      if (godMode) {
+        floatText('🛡️ BLOCKED', 'crit', true);
+        return;
+      }
       const dmg = Engine.enemyAttack(enemy, hero);
       heroHp = Math.max(0, heroHp - dmg);
       floatText(`-${dmg}`, 'player-hit', true);
@@ -936,6 +940,73 @@ setInterval(async () => {
 
 $('gm-announce-close').onclick = () => $('gm-announce').classList.add('hidden');
 
+// GM Powers
+let godMode = false;
+
+$('gm-godmode') && ($('gm-godmode').onclick = () => {
+  godMode = !godMode;
+  Engine.logGMAction(hero, 'godmode', godMode ? 'ON' : 'OFF');
+  saveHero();
+  updateGMStatus();
+  toast(godMode ? '⚡ GOD MODE ON — invincible!' : '⚡ God mode off');
+});
+
+$('gm-gear') && ($('gm-gear').onclick = () => {
+  for (const [slot, item] of Object.entries(Engine.GM_GEAR)) {
+    hero.gear[slot] = { ...item };
+  }
+  Engine.logGMAction(hero, 'gm_gear', 'Equipped GM gear');
+  saveHero();
+  updateHUD();
+  updateGMStatus();
+  const st = Engine.heroStats(hero);
+  heroHp = st.hp;
+  heroMana = st.mana;
+  toast('👑 GM Gear equipped! You are unstoppable.');
+});
+
+$('gm-kill') && ($('gm-kill').onclick = () => {
+  if (enemy && enemy.hp > 0) {
+    Engine.logGMAction(hero, 'smite', `${enemy.name} (Stage ${enemy.stage})`);
+    enemy.hp = 0;
+    updateEnemyBar();
+    onKill();
+    toast('💀 SMITED!');
+  } else {
+    toast('No enemy to smite');
+  }
+});
+
+$('gm-gold-drop') && ($('gm-gold-drop').onclick = () => {
+  hero.gold += 10000;
+  Engine.logGMAction(hero, 'gold', '+10000');
+  saveHero();
+  updateHUD();
+  toast('💰 +10,000 gold');
+});
+
+function updateGMStatus() {
+  const el = $('gm-status');
+  if (el) el.textContent = godMode ? '⚡ GOD MODE ACTIVE' : '';
+  renderGMLog();
+}
+
+function renderGMLog() {
+  const el = $('gm-log');
+  if (!el) return;
+  const log = hero.gmLog || [];
+  el.innerHTML = log.length ? '' : '<p style="color:#666">No GM actions logged.</p>';
+  for (const e of [...log].reverse().slice(0, 20)) {
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-stats">${new Date(e.at).toLocaleTimeString()} — <b>${e.action}</b>: ${escapeHtml(e.detail)}</div></div>`;
+    el.appendChild(div);
+  }
+}
+
+// God mode: prevent death
+const origOnDeath = typeof onDeath !== 'undefined' ? onDeath : null;
+
 // GM Player Inspector
 $('gm-inspect-btn') && ($('gm-inspect-btn').onclick = async () => {
   const name = $('gm-inspect-input').value.trim();
@@ -1023,7 +1094,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'quests') renderQuests();
     if (btn.dataset.tab === 'auction') renderAuction();
     if (btn.dataset.tab === 'mail') renderMail();
-    if (btn.dataset.tab === 'gm') loadGMFeedback();
+    if (btn.dataset.tab === 'gm') { loadGMFeedback(); updateGMStatus(); }
     if (btn.dataset.tab === 'chat') {
       loadChat();
       clearInterval(chatTimer);

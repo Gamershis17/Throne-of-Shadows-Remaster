@@ -449,6 +449,21 @@ export function checkAuctionSalesMail(hero) {
   return sold;
 }
 
+// --- GM Powers ---
+// OP GM gear (not obtainable normally)
+export const GM_GEAR = {
+  weapon: { id: 'gm-weapon', slot: 'weapon', name: '⚡ Martin Fury', rarity: 'GM', color: '#ff00ff', atk: 99999, def: 0, hp: 0 },
+  armor: { id: 'gm-armor', slot: 'armor', name: '🛡️ Godplate of the Admin', rarity: 'GM', color: '#ff00ff', atk: 0, def: 99999, hp: 99999 },
+  trinket: { id: 'gm-trinket', slot: 'trinket', name: '👁️ Eye of Providence', rarity: 'GM', color: '#ff00ff', atk: 9999, def: 9999, hp: 99999 },
+};
+
+// GM action log (for accountability)
+export function logGMAction(hero, action, detail) {
+  hero.gmLog = hero.gmLog || [];
+  hero.gmLog.push({ action, detail, at: Date.now() });
+  if (hero.gmLog.length > 100) hero.gmLog.shift();
+}
+
 // Check quest progress
 export function questProgress(hero, quest) {
   const mats = hero.materials || {};
