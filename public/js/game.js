@@ -1031,7 +1031,48 @@ $('gm-inspect-btn') && ($('gm-inspect-btn').onclick = async () => {
           ${Object.entries(p.gear || {}).map(([s, i]) => `${s}: ${i ? i.name : 'empty'}`).join('<br>')}
         </div>
         ${p.inventory?.length ? `<div class="g-stats" style="margin-top:8px"><b>Bags:</b><br>${p.inventory.map(i => i.name).join('<br>')}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:4px;margin-top:8px">
+        <input type="number" id="mod-gold-${p.name}" placeholder="Gold" style="width:80px;padding:4px;background:#1a1528;border:1px solid #2a2440;border-radius:4px;color:#fff">
+        <button class="btn small" data-mod-gold="${p.name}">Set</button>
+      </div>
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <input type="number" id="mod-level-${p.name}" placeholder="Level" style="width:80px;padding:4px;background:#1a1528;border:1px solid #2a2440;border-radius:4px;color:#fff">
+        <button class="btn small" data-mod-level="${p.name}">Set</button>
       </div></div>`;
+    // Wire modify buttons
+    el.querySelectorAll('[data-mod-gold]').forEach(btn => {
+      btn.onclick = async () => {
+        const v = parseInt($(`mod-gold-${btn.dataset.modGold}`).value);
+        if (v >= 0) {
+          await fetch(`/api/gm/modify/${encodeURIComponent(btn.dataset.modGold)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gold: v }),
+          });
+          Engine.logGMAction(hero, 'mod_gold', `${btn.dataset.modGold} -> ${v}`);
+          saveHero();
+          toast(`💰 Set ${btn.dataset.modGold}'s gold to ${v}`);
+          $('gm-inspect-btn').click(); // Refresh
+        }
+      };
+    });
+    el.querySelectorAll('[data-mod-level]').forEach(btn => {
+      btn.onclick = async () => {
+        const v = parseInt($(`mod-level-${btn.dataset.modLevel}`).value);
+        if (v >= 1 && v <= 100) {
+          await fetch(`/api/gm/modify/${encodeURIComponent(btn.dataset.modLevel)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ level: v }),
+          });
+          Engine.logGMAction(hero, 'mod_level', `${btn.dataset.modLevel} -> ${v}`);
+          saveHero();
+          toast(`🎉 Set ${btn.dataset.modLevel}'s level to ${v}`);
+          $('gm-inspect-btn').click(); // Refresh
+        }
+      };
+    });
   } catch {
     $('gm-inspect-result').innerHTML = '<p style="color:#e5484d">Error loading player.</p>';
   }

@@ -181,6 +181,24 @@ app.get('/api/gm/inspect/:name', async (req, res) => {
   }
 });
 
+// GM: modify player stats
+app.post('/api/gm/modify/:name', async (req, res) => {
+  if (!isGM(req) || !pool) return res.json({ ok: false });
+  const { gold, level } = req.body || {};
+  try {
+    const r = await pool.query('SELECT data FROM players WHERE name = $1', [req.params.name]);
+    if (!r.rows[0]) return res.json({ ok: false, error: 'Not found' });
+    const data = r.rows[0].data;
+    if (gold !== undefined && gold >= 0) data.gold = gold;
+    if (level !== undefined && level >= 1 && level <= 100) data.level = level;
+    await pool.query('UPDATE players SET data = $1, updated_at = NOW() WHERE name = $2',
+      [JSON.stringify(data), req.params.name]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
 // GM: list all players
 app.get('/api/gm/players', async (req, res) => {
   if (!isGM(req) || !pool) return res.json({ ok: false });
