@@ -786,3 +786,17 @@ body {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* --- Panels (original card style) --- */
+.panel {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid #4a3a5a;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 12px 0;
+}
+
+.tab {
+  background: linear-gradient(180deg, #2a1a3a 0%, #1a0f2a 100%);
+  min-height: 100vh;
+}
