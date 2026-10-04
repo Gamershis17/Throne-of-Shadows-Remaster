@@ -7261,3 +7261,101 @@ body[data-uistyle="modern"] .btn {
   background-size: cover;
   background-position: center;
 }
+
+/* ============================================================
+   REMASTER: 2D MMO Action Layout (like reference screenshot)
+   ============================================================ */
+
+/* Right-edge circular action buttons */
+.battle-side {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
+}
+
+.tap-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  font-size: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, #4a3a2a 0%, #2a1e14 100%);
+  border: 3px solid rgba(212, 160, 23, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.tap-btn span {
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* Bottom spell bar */
+.skill-row {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 50;
+  background: rgba(10, 8, 18, 0.8);
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-row button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 20px;
+  background: radial-gradient(circle at 30% 30%, #3a2a4a 0%, #1e1430 100%);
+  border: 2px solid rgba(139, 92, 246, 0.4);
+}
+
+/* Mobile: smaller buttons */
+@media (max-width: 1023px) {
+  .battle-side {
+    right: 8px;
+  }
+  
+  .tap-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .skill-row {
+    bottom: 70px;
+    padding: 6px 8px;
+  }
+  
+  .skill-row button {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+/* PC: larger, more spaced */
+@media (min-width: 1024px) {
+  .tap-btn {
+    width: 84px;
+    height: 84px;
+    font-size: 32px;
+  }
+  
+  .skill-row button {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+}
