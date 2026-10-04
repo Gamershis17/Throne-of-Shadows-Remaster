@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Throne of Shadows">
   <title>Throne of Shadows</title>
-  <link rel="stylesheet" href="css/style.css?v20261004e">
+  <link rel="stylesheet" href="css/style.css?v20261004f">
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -185,8 +185,28 @@
           <button class="mode-btn" data-mode="raid">🌀<span>Raid</span></button>
           <button class="mode-btn" data-mode="tower">🗼<span>Tower</span></button>
         </div>
-        <div class="battle-main">
-          <div class="enemy-card" id="enemy-card">
+        <div class="stage-display">
+          <div class="stage-number" id="stage-number">Stage 1</div>
+          <div class="stage-wave" id="stage-wave">Wave 1 / 10</div>
+        </div>
+        <div class="battle-arena-2d" id="battle-arena">
+          <div class="fighter player">
+            <div class="fighter-sprite" id="player-sprite">🛡️</div>
+            <div class="fighter-name" id="player-name">Hero</div>
+            <div class="bar hp fighter-hp"><div class="fill" id="hero-hpfill"></div><span class="bar-text" id="hero-hptext"></span></div>
+          </div>
+          <div class="vs-badge">⚔️</div>
+          <div class="fighter enemy">
+            <div class="fighter-sprite" id="enemy-sprite">🐺</div>
+            <div class="fighter-name" id="enemy-name">—</div>
+            <div class="bar hp fighter-hp enemy-hp"><div class="fill" id="enemy-hpfill"></div><span class="bar-text" id="enemy-hptext"></span></div>
+            <div class="boss-badge hidden" id="boss-badge">BOSS</div>
+          </div>
+          <div class="float-layer" id="float-layer"></div>
+          <div class="dead-overlay hidden" id="dead-overlay">💀<div>You fell! Reviving…</div></div>
+        </div>
+        <div class="battle-main" style="display:none;">
+          <div class="enemy-card" id="enemy-card" style="display:none;">
             <div class="enemy-top">
               <div class="enemy-sprite" id="enemy-sprite">🐺</div>
               <div class="enemy-info">
@@ -476,7 +496,7 @@
 <div id="gm-rainbow-frame"></div>
 <div id="toast-root"></div>
 
-<script type="module" src="js/app.js?v20261004e"></script>
+<script type="module" src="js/app.js?v20261004f"></script>
 <script type="module" src="js/gamepad.js?v=20260930ar"></script>
 </body>
 </html>

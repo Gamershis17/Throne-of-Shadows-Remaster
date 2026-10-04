@@ -1087,6 +1087,10 @@ export const UI = {
 
   showTab(name) {
     this.activeTab = name;
+    // REMASTER: update player sprite when entering battle
+    if (name === 'battle' && window.App && App.state) {
+      try { this.updatePlayerSprite(App.state); } catch {}
+    }
     if (name !== 'quests') { this._stopQuestCountdowns(); this._stopQuestSync(); }
     if (name !== 'tokenshop') this._stopTokenCountdown();
     // Leaving the inn by any route (e.g. tab bar) stops its glow loop;
@@ -2266,6 +2270,10 @@ export const UI = {
     // Tower floors show the floor number and hazard.
     if (enemy.towerFloor) {
       const hazard = enemy.hazard ? Engine.TOWER_HAZARDS[enemy.hazard] : null;
+      const stageNum = document.getElementById('stage-number');
+      const stageWave = document.getElementById('stage-wave');
+      if (stageNum) stageNum.textContent = `Stage ${Math.ceil(enemy.towerFloor / 10) || 1}`;
+      if (stageWave) stageWave.textContent = `Floor ${enemy.towerFloor || 1} / 10 waves`;
       e['enemy-stage'].textContent = `🗼 Tower — Floor ${enemy.towerFloor}` +
         (hazard ? ` · ${hazard.emoji} ${hazard.name}` : '');
       // Floor 1000+ gets the full rainbow; milestones get a softer version
@@ -5700,6 +5708,18 @@ export const UI = {
   },
 
   // ---------------- stats tab ----------------
+  updatePlayerSprite(state) {
+    const sprite = document.getElementById('player-sprite');
+    if (!sprite || !state) return;
+    const classEmoji = {
+      warrior: '🛡️', hunter: '🏹', mage: '🔮', druid: '🌿',
+      assassin: '🗡️', necromancer: '💀', berserker: '🪓'
+    };
+    sprite.textContent = classEmoji[state.playerClass] || '🛡️';
+    const nameEl = document.getElementById('player-name');
+    if (nameEl) nameEl.textContent = state.heroName || 'Hero';
+  },
+
   renderStats(state, user) {
     // REMASTER: refresh raid panels whenever Stats tab renders
     try {
