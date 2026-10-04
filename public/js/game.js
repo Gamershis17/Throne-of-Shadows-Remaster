@@ -733,6 +733,70 @@ function renderQuests() {
   }
 }
 
+// --- Auction House ---
+function renderAuction() {
+  // Check for sales
+  const sold = Engine.checkAuctionSales(hero);
+  if (sold.length) {
+    saveHero();
+    updateHUD();
+    for (const s of sold) toast(`💰 Sold ${s.name} for ${s.listPrice}g!`);
+  }
+
+  // Your listings
+  const al = $('auction-list');
+  al.innerHTML = '';
+  const auctions = hero.auctions || [];
+  if (!auctions.length) al.innerHTML = '<p style="color:#666">No listings. List items from your inventory below.</p>';
+  for (const a of auctions) {
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-name" style="color:${a.color}">${a.name}</div>
+      <div class="g-stats">Listed for ${a.listPrice}g</div></div>
+      <button class="btn small" data-cancel="${a.id}">Cancel</button>`;
+    al.appendChild(div);
+  }
+  al.querySelectorAll('[data-cancel]').forEach(btn => {
+    btn.onclick = () => {
+      Engine.cancelAuction(hero, btn.dataset.cancel);
+      saveHero();
+      renderAuction();
+      updateHUD();
+      toast('Listing cancelled');
+    };
+  });
+
+  // Inventory (listable items)
+  const inv = $('auction-inventory');
+  inv.innerHTML = '';
+  if (!hero.inventory.length) inv.innerHTML = '<p style="color:#666">Inventory empty</p>';
+  for (const item of hero.inventory) {
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    const suggested = Engine.sellPrice(item, hero) * 3; // Suggest 3x vendor price
+    div.innerHTML = `<div><div class="g-name" style="color:${item.color}">${item.name}</div>
+      <div class="g-stats">+${item.atk} atk +${item.def} def +${item.hp} hp</div></div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <input type="number" id="price-${item.id}" value="${suggested}" min="1" style="width:70px;padding:6px;background:#1a1528;border:1px solid #2a2440;border-radius:4px;color:#fff">
+        <button class="btn small gold" data-list="${item.id}">List</button>
+      </div>`;
+    inv.appendChild(div);
+  }
+  inv.querySelectorAll('[data-list]').forEach(btn => {
+    btn.onclick = () => {
+      const priceInput = $(`price-${btn.dataset.list}`);
+      const price = parseInt(priceInput.value) || 1;
+      const r = Engine.listAuction(hero, btn.dataset.list, price);
+      if (r.ok) {
+        saveHero();
+        renderAuction();
+        updateHUD();
+        toast(`📋 Listed for ${price}g`);
+      }
+    };
+  });
+}
+
 // --- Tabs ---
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.onclick = () => {
@@ -743,6 +807,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'party') renderParty();
     if (btn.dataset.tab === 'dungeon') renderDungeons();
     if (btn.dataset.tab === 'quests') renderQuests();
+    if (btn.dataset.tab === 'auction') renderAuction();
     if (btn.dataset.tab !== 'battle') updateHUD();
   };
 });

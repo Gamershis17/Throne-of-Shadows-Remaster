@@ -246,6 +246,148 @@ export const QUESTS = [
   },
 ];
 
+// --- Vendors ---
+export const VENDORS = [
+  {
+    id: 'blacksmith', name: 'Gromm the Blacksmith', emoji: '🔨',
+    desc: 'Weapons and armor',
+    sells: ['weapon', 'armor'], // gear slots
+  },
+  {
+    id: 'trader', name: 'Mira the Trader', emoji: '🧺',
+    desc: 'Food and supplies',
+    sells: ['food'],
+  },
+  {
+    id: 'alchemist', name: 'Zoltar the Alchemist', emoji: '⚗️',
+    desc: 'Potions and trinkets',
+    sells: ['potion', 'trinket'],
+  },
+];
+
+// Generate vendor stock (scales with hero level)
+export function vendorStock(vendorId, heroLevel) {
+  const vendor = VENDORS.find(v => v.id === vendorId);
+  if (!vendor) return [];
+  const stock = [];
+  const scale = Math.pow(1.1, heroLevel - 1);
+  for (const type of vendor.sells) {
+    if (type === 'food') {
+      for (const [fid, food] of Object.entries(PET_FOODS)) {
+        stock.push({
+          id: 'food-' + fid, type: 'food', foodId: fid,
+          name: `${food.emoji} ${food.name}`,
+          desc: `Pet food (+${food.loyalty} loyalty)`,
+          price: food.cost * heroLevel,
+        });
+      }
+    } else if (type === 'potion') {
+      stock.push({
+        id: 'potion-hp', type: 'potion',
+        name: '🧪 Health Potion',
+        desc: `Restores ${50 * heroLevel} HP`,
+        price: 25 * heroLevel, heal: 50 * heroLevel,
+      });
+      stock.push({
+        id: 'potion-mana', type: 'potion',
+        name: '💧 Mana Potion',
+        desc: `Restores ${30 * heroLevel} Mana`,
+        price: 20 * heroLevel, mana: 30 * heroLevel,
+      });
+    } else {
+      // Gear (weapon/armor/trinket)
+      for (let i = 0; i < 3; i++) {
+        const slot = type;
+        const names = {
+          weapon: ['Sword', 'Axe', 'Dagger'],
+          armor: ['Plate', 'Leather', 'Robe'],
+          trinket: ['Amulet', 'Ring', 'Charm'],
+        };
+        const item = {
+          id: `v-${vendorId}-${slot}-${i}-${Date.now()}`,
+          type: 'gear', slot,
+          name: `${names[slot][i % 3]}`,
+          atk: slot === 'weapon' ? Math.floor(8 * scale) : Math.floor(2 * scale),
+          def: slot === 'armor' ? Math.floor(6 * scale) : 0,
+          hp: slot === 'trinket' ? Math.floor(30 * scale) : Math.floor(10 * scale),
+          price: Math.floor(100 * scale),
+          color: '#4a90d9', rarity: 'Magic',
+        };
+        stock.push(item);
+      }
+    }
+  }
+  return stock;
+}
+
+// Buy from vendor
+export function buyFromVendor(hero, item) {
+  if (hero.gold < item.price) return { ok: false, reason: 'gold' };
+  hero.gold -= item.price;
+  if (item.type === 'gear') {
+    hero.inventory.push(item);
+  } else if (item.type === 'food') {
+    hero.food = hero.food || {};
+    hero.food[item.foodId] = (hero.food[item.foodId] || 0) + 1;
+  } else if (item.type === 'potion') {
+    hero.potions = hero.potions || [];
+    hero.potions.push(item);
+  }
+  return { ok: true };
+}
+
+// Sell price — low early, better at higher levels/zones
+// Formula: base * (1 + level/50) * (1 + stage/100)
+export function sellPrice(item, hero) {
+  const base = (item.atk || 0) * 2 + (item.def || 0) * 2 + (item.hp || 0) * 0.5;
+  const levelMult = 1 + hero.level / 50;
+  const stageMult = 1 + hero.stage / 100;
+  return Math.max(1, Math.floor(base * 0.3 * levelMult * stageMult));
+}
+
+// --- Auction House ---
+// List an item for sale
+export function listAuction(hero, itemId, price) {
+  const idx = hero.inventory.findIndex(i => i.id === itemId);
+  if (idx === -1) return { ok: false };
+  if (price < 1) return { ok: false, reason: 'price' };
+  const item = hero.inventory[idx];
+  hero.inventory.splice(idx, 1);
+  hero.auctions = hero.auctions || [];
+  hero.auctions.push({ ...item, listPrice: price, listedAt: Date.now() });
+  return { ok: true };
+}
+
+// Cancel auction (get item back)
+export function cancelAuction(hero, itemId) {
+  hero.auctions = hero.auctions || [];
+  const idx = hero.auctions.findIndex(a => a.id === itemId);
+  if (idx === -1) return { ok: false };
+  const item = hero.auctions[idx];
+  delete item.listPrice;
+  delete item.listedAt;
+  hero.inventory.push(item);
+  hero.auctions.splice(idx, 1);
+  return { ok: true };
+}
+
+// Simulate NPC buyers (called periodically)
+export function checkAuctionSales(hero) {
+  hero.auctions = hero.auctions || [];
+  const sold = [];
+  const now = Date.now();
+  hero.auctions = hero.auctions.filter(a => {
+    // 10% chance per check to sell (if listed for >30s)
+    if (now - a.listedAt > 30000 && Math.random() < 0.1) {
+      hero.gold += a.listPrice;
+      sold.push(a);
+      return false;
+    }
+    return true;
+  });
+  return sold;
+}
+
 // Check quest progress
 export function questProgress(hero, quest) {
   const mats = hero.materials || {};
