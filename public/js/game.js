@@ -735,12 +735,14 @@ function renderQuests() {
 
 // --- Auction House ---
 function renderAuction() {
-  // Check for sales
-  const sold = Engine.checkAuctionSales(hero);
-  if (sold.length) {
+  // Check for sales (goes to mail) and expiry (returns via mail)
+  const sold = Engine.checkAuctionSalesMail(hero);
+  const expired = Engine.checkAuctionExpiry(hero);
+  if (sold.length || expired.length) {
     saveHero();
     updateHUD();
-    for (const s of sold) toast(`💰 Sold ${s.name} for ${s.listPrice}g!`);
+    if (sold.length) toast(`📬 ${sold.length} auction(s) sold! Check mail.`);
+    if (expired.length) toast(`📬 ${expired.length} expired! Check mail.`);
   }
 
   // Your listings
@@ -797,6 +799,41 @@ function renderAuction() {
   });
 }
 
+// --- Mail ---
+function renderMail() {
+  const ml = $('mail-list');
+  ml.innerHTML = '';
+  const mail = hero.mail || [];
+  const unread = mail.filter(m => !m.read && (m.gold || m.item)).length;
+  $('mail-count').textContent = unread ? `(${unread} new)` : '';
+
+  if (!mail.length) {
+    ml.innerHTML = '<p style="color:#666">No mail. Auction sales and returns arrive here.</p>';
+    return;
+  }
+  // Newest first
+  for (const m of [...mail].reverse()) {
+    const hasItems = m.gold > 0 || m.item;
+    const div = document.createElement('div');
+    div.className = 'gear-item';
+    div.innerHTML = `<div><div class="g-name">${m.subject} ${!m.read && hasItems ? '📩' : ''}</div>
+      <div class="g-stats">${m.body}</div>
+      ${m.gold ? `<div class="g-stats">💰 ${m.gold}g</div>` : ''}
+      ${m.item ? `<div class="g-stats">📦 ${m.item.name}</div>` : ''}</div>
+      ${hasItems ? `<button class="btn small gold" data-claim="${m.id}">Claim</button>` : ''}`;
+    ml.appendChild(div);
+  }
+  ml.querySelectorAll('[data-claim]').forEach(btn => {
+    btn.onclick = () => {
+      Engine.claimMail(hero, btn.dataset.claim);
+      saveHero();
+      renderMail();
+      updateHUD();
+      toast('📬 Claimed!');
+    };
+  });
+}
+
 // --- Tabs ---
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.onclick = () => {
@@ -808,6 +845,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'dungeon') renderDungeons();
     if (btn.dataset.tab === 'quests') renderQuests();
     if (btn.dataset.tab === 'auction') renderAuction();
+    if (btn.dataset.tab === 'mail') renderMail();
     if (btn.dataset.tab !== 'battle') updateHUD();
   };
 });

@@ -388,6 +388,67 @@ export function checkAuctionSales(hero) {
   return sold;
 }
 
+// --- Mail ---
+// Send mail to hero
+export function sendMail(hero, subject, body, gold, item) {
+  hero.mail = hero.mail || [];
+  hero.mail.push({
+    id: 'm' + Date.now() + Math.floor(Math.random() * 9999),
+    subject, body, gold: gold || 0, item: item || null,
+    read: false, at: Date.now(),
+  });
+}
+
+// Claim mail attachments
+export function claimMail(hero, mailId) {
+  hero.mail = hero.mail || [];
+  const m = hero.mail.find(x => x.id === mailId);
+  if (!m) return false;
+  if (m.gold) hero.gold += m.gold;
+  if (m.item) hero.inventory.push(m.item);
+  m.gold = 0;
+  m.item = null;
+  m.read = true;
+  return true;
+}
+
+// Auction expiry: 1 hour. Unsold items return via mail.
+export function checkAuctionExpiry(hero) {
+  hero.auctions = hero.auctions || [];
+  const now = Date.now();
+  const expired = [];
+  hero.auctions = hero.auctions.filter(a => {
+    if (now - a.listedAt > 3600000) { // 1 hour
+      const { listPrice, listedAt, ...item } = a;
+      expired.push(item);
+      return false;
+    }
+    return true;
+  });
+  for (const item of expired) {
+    sendMail(hero, '📦 Auction Expired', `${item.name} didn't sell. Returned to you.`, 0, item);
+  }
+  return expired;
+}
+
+// Updated: sales go to mail, not direct gold
+export function checkAuctionSalesMail(hero) {
+  hero.auctions = hero.auctions || [];
+  const now = Date.now();
+  const sold = [];
+  hero.auctions = hero.auctions.filter(a => {
+    if (now - a.listedAt > 30000 && Math.random() < 0.1) {
+      sold.push(a);
+      return false;
+    }
+    return true;
+  });
+  for (const s of sold) {
+    sendMail(hero, '💰 Auction Sold!', `${s.name} sold for ${s.listPrice}g.`, s.listPrice, null);
+  }
+  return sold;
+}
+
 // Check quest progress
 export function questProgress(hero, quest) {
   const mats = hero.materials || {};
