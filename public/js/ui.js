@@ -5692,6 +5692,18 @@ export const UI = {
 
   // ---------------- stats tab ----------------
   renderStats(state, user) {
+    // REMASTER: refresh raid panels whenever Stats tab renders
+    try {
+      if (typeof updateDirectivePanel === 'function' && this.directiveLootConfig) {
+        updateDirectivePanel(state, this.directiveLootConfig);
+      }
+    } catch (e) {}
+    try {
+      if (typeof updateTier2LobbyUI === 'function') updateTier2LobbyUI();
+    } catch (e) {}
+    try {
+      if (typeof updateWarEffortUI === 'function') updateWarEffortUI();
+    } catch (e) {}
     const race = Engine.RACES[state.race] || {};
     const cls = Engine.CLASSES[state.playerClass] || {};
     const spec = Engine.SPECS[state.spec] || {};
@@ -6006,8 +6018,22 @@ export const UI = {
 // Call: updateDirectivePanel(state, lootConfig)
 function updateDirectivePanel(state, lootConfig) {
   if (typeof Engine === 'undefined') return;
+  if (!state) {
+    const zoneEl = document.querySelector('#directive-active .directive-zone');
+    if (zoneEl) zoneEl.textContent = 'Loading character data...';
+    return;
+  }
   const attunementChain = (typeof UI !== 'undefined' && UI.directiveAttunement) || null;
-  const result = Engine.selectOptimalFarmingZone(state, lootConfig, 150, attunementChain);
+  let result;
+  try {
+    result = Engine.selectOptimalFarmingZone(state, lootConfig, 150, attunementChain);
+  } catch (e) {
+    const zoneEl = document.querySelector('#directive-active .directive-zone');
+    const reasonEl = document.querySelector('#directive-active .directive-reason');
+    if (zoneEl) zoneEl.textContent = 'Farm dungeons to build Fire Resistance';
+    if (reasonEl) reasonEl.textContent = 'Complete dungeons and equip fire resistance gear to prepare for Molten Depths (150 FR required).';
+    return;
+  }
   const fr = Engine.getResistance(state, 'fire');
   const hasAttunement = (state.flags || []).includes('has_core_fragment')
     || (state.attunements || {}).has_core_fragment;
