@@ -586,3 +586,94 @@ body {
 }
 
 .gm-announce-box button { margin-top: 16px; }
+
+/* --- Side Menu --- */
+.menu-btn {
+  background: none;
+  border: 2px solid #4a3a1a;
+  border-radius: 4px;
+  color: #ffd23f;
+  font-size: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: linear-gradient(180deg, #1e1a14 0%, #0d0a08 100%);
+  border-right: 2px solid #4a3a1a;
+  z-index: 250;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu:not(.hidden) {
+  transform: translateX(0);
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 2px solid #4a3a1a;
+  font-weight: 700;
+  color: #ffd23f;
+  font-size: 18px;
+}
+
+.menu-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #2a2418;
+  color: #d4c5a0;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.menu-item:active {
+  background: rgba(255,210,63,0.1);
+}
+
+.menu-item .mi-emoji {
+  font-size: 20px;
+}
+
+.menu-item.active {
+  color: #ffd23f;
+  background: rgba(255,210,63,0.05);
+}
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 240;
+}
+
+/* Full-page tabs (no bottom bar) */
+.tab {
+  padding: 20px 16px 40px;
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: calc(100vh - 70px);
+}

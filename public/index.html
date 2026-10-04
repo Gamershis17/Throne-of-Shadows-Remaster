@@ -25,6 +25,7 @@
 <!-- GAME -->
 <section id="view-game" class="view hidden">
   <header class="game-header">
+    <button id="menu-btn" class="menu-btn">☰</button>
     <div class="hero-info">
       <span id="hud-emoji" class="hud-emoji">🛡️</span>
       <div>
@@ -37,6 +38,16 @@
       <span>🗺️ <b id="hud-stage">1</b></span>
     </div>
   </header>
+
+  <!-- Slide-out menu -->
+  <div id="side-menu" class="side-menu hidden">
+    <div class="menu-header">
+      <span>📜 Menu</span>
+      <button id="menu-close" class="btn small">✕</button>
+    </div>
+    <div id="menu-items" class="menu-items"></div>
+  </div>
+  <div id="menu-overlay" class="menu-overlay hidden"></div>
 
   <div class="hp-bar"><div id="hero-hp-fill" class="hp-fill"></div><span id="hero-hp-text" class="bar-text"></span></div>
   <div class="mana-bar"><div id="hero-mana-fill" class="mana-fill"></div><span id="hero-mana-text" class="bar-text"></span></div>
