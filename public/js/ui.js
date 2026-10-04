@@ -4496,14 +4496,10 @@ export const UI = {
           return cardHtml('story', entry, progress, target, complete, def, rw, lockedHint);
         }).join('');
     };
-    renderList('daily', 'quest-daily', '☀️ Daily quests', 'quest-daily-cd');
-    renderList('weekly', 'quest-weekly', '📅 Weekly quests', 'quest-weekly-cd');
-    renderStoryList('guide', 'quest-guide', '🧭 New Adventurer Guide', 'one-time · step by step');
-    renderStoryList('class', 'quest-class', '🔮 Class questline', 'mages only · one-time');
-    renderStoryList('mastery', 'quest-mastery', '🎯 Skill mastery', 'one-time');
-    // Start (and immediately populate) the live reset countdowns now that
-    // the header spans exist.
-    this._startQuestCountdowns();
+    // REMASTER Classic: story quests only (no daily/weekly grind)
+    renderStoryList('guide', 'quest-guide', '🧭 Adventurer's Journey', 'story quests');
+    renderStoryList('class', 'quest-class', '🔮 Class questline', 'one-time');
+
     // Sync progress immediately on open (no stale "0 / N" flash) and keep it
     // ticking while the tab is visible so counters never look frozen.
     this._syncQuestProgress(state, true);

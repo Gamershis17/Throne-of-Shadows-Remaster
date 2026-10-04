@@ -533,7 +533,7 @@ export function renderGuildSection(container, api, myState) {
         </div>
       </div>
       <div class="guild-tabs" role="tablist">
-        ${['chat', 'hall', 'news', 'roster', 'perks', 'rewards', 'info'].map((t, i) =>
+        ${['chat', 'roster', 'info'].map((t, i) =>
           `<button class="guild-tabbtn${i === 0 ? ' active' : ''}" data-subtab="${t}" role="tab">${subTabLabel(t)}</button>`
         ).join('')}
       </div>
@@ -561,11 +561,7 @@ export function renderGuildSection(container, api, myState) {
       const p = panel();
       if (!p) return;
       if (name === 'chat') renderChatTab(p, guild);
-      else if (name === 'hall') renderHallTab(p, guild);
-      else if (name === 'news') renderNewsTab(p);
       else if (name === 'roster') renderRosterTab(p, guild, members, myState);
-      else if (name === 'perks') renderPerksTab(p, guild);
-      else if (name === 'rewards') renderRewardsTab(p, guild);
       else if (name === 'info') renderInfoTab(p, guild, members, challenges);
     };
     wrap.querySelectorAll('.guild-tabbtn').forEach((b) => {
@@ -575,7 +571,7 @@ export function renderGuildSection(container, api, myState) {
   }
 
   function subTabLabel(t) {
-    return { chat: '💬 Chat', hall: '🏛️ Hall', news: '📰 News', roster: '👥 Roster', perks: '✨ Perks', rewards: '🎁 Rewards', info: 'ℹ️ Info' }[t] || t;
+    return { chat: '💬 Chat', roster: '👥 Roster', info: 'ℹ️ Info' }[t] || t;
   }
 
   // Cumulative XP floor for a guild level (mirrors server xpForGuildLevel).
