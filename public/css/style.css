@@ -6780,3 +6780,130 @@ body.theme-gothic-manor .panel, body.theme-gothic-manor .card {
 .remaster-auth .game-title {
   text-shadow: 0 0 20px rgba(255, 107, 53, 0.5), 0 2px 4px rgba(0,0,0,0.8);
 }
+
+/* ============================================================
+   REMASTER: Classic Fantasy Visual Overhaul
+   PC + Mobile responsive, rich Classic MMO aesthetic
+   ============================================================ */
+
+/* --- Desktop layout: centered, multi-column --- */
+@media (min-width: 1024px) {
+  #app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  
+  /* Two-column layout for tab content on desktop */
+  .tab.active {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  
+  /* Full-width for battle tab */
+  #tab-battle.active {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* Cards get richer styling on desktop */
+  .card {
+    background: linear-gradient(180deg, #1e1830 0%, #151020 100%);
+    border: 1px solid rgba(212, 160, 23, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* --- Mobile: single column, touch-friendly --- */
+@media (max-width: 1023px) {
+  #app {
+    padding: 0 12px;
+  }
+  
+  .tab.active {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Larger touch targets */
+  .btn {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  
+  .tab-btn {
+    min-height: 56px;
+  }
+}
+
+/* --- Classic fantasy card headers --- */
+.card h2, .card h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #ffd23f;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(212, 160, 23, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+/* --- Classic buttons: rich, tactile --- */
+.btn {
+  background: linear-gradient(180deg, #3a2d5c 0%, #241d3d 100%);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 10px;
+  color: #e8e4f0;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn.success {
+  background: linear-gradient(180deg, #2d5c3a 0%, #1d3d24 100%);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.btn.gold {
+  background: linear-gradient(180deg, #5c4a2d 0%, #3d301d 100%);
+  border-color: rgba(255, 210, 63, 0.4);
+  color: #ffd23f;
+}
+
+/* --- Tab navigation: cleaner --- */
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #9a93b3;
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-btn.active {
+  color: #ffd23f;
+  border-bottom-color: #ffd23f;
+}
+
+.tab-btn .ticon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* --- Stats/HUD: cleaner readout --- */
+.hud-stat {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
+}
