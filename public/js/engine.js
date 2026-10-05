@@ -2,6 +2,8 @@
 // engine.js — Classic MMORPG idle game math
 // Clean, data-driven, no legacy baggage.
 // ============================================================
+import { BALANCE } from './balance.js';
+import { talentBonuses } from './talents.js';
 
 export const CLASSES = {
   warrior: {
@@ -46,9 +48,9 @@ export const BOSS_TYPES = [
   { emoji: '🤖', name: 'Iron Golem' },
 ];
 
-// XP needed for level N (cumulative)
+// XP needed for level N (cumulative) — data-driven
 export function xpForLevel(level) {
-  return Math.floor(100 * Math.pow(level, 1.5));
+  return Math.floor(BALANCE.xp.base * Math.pow(level, BALANCE.xp.exp));
 }
 
 // Create a new hero
@@ -130,7 +132,7 @@ export function feedPet(hero, foodId) {
   return { ok: true, gain, rightFood: isRight, food };
 }
 
-// Calculate hero stats from level + gear
+// Calculate hero stats from level + gear + talents (data-driven)
 export function heroStats(hero) {
   const cls = CLASSES[hero.classId];
   let hp = cls.baseHp + cls.hpPerLevel * (hero.level - 1);
@@ -138,9 +140,9 @@ export function heroStats(hero) {
   let def = cls.baseDef + cls.defPerLevel * (hero.level - 1);
   let critChance = cls.critChance;
   let critMult = cls.critMult;
-  // Mana scales with level
   let mana = 50 + hero.level * 5;
 
+  // Gear (kept as-is per design)
   for (const slot of Object.values(hero.gear)) {
     if (!slot) continue;
     hp += slot.hp || 0;
@@ -149,6 +151,15 @@ export function heroStats(hero) {
     critChance += slot.critChance || 0;
     mana += slot.mana || 0;
   }
+
+  // Talents (WoW-style percentage bonuses)
+  const tb = talentBonuses(hero);
+  atk *= 1 + (tb.atkPct || 0) / 100;
+  def *= 1 + (tb.defPct || 0) / 100;
+  hp *= 1 + (tb.hpPct || 0) / 100;
+  mana *= 1 + (tb.manaPct || 0) / 100;
+  critChance += tb.critChance || 0;
+  critMult += tb.critMult || 0;
 
   return { hp: Math.floor(hp), atk: Math.floor(atk), def: Math.floor(def), critChance, critMult, mana: Math.floor(mana) };
 }

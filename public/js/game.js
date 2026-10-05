@@ -3,6 +3,8 @@
 // Fresh start: clean, simple, from the bottom up.
 // ============================================================
 import * as Engine from './engine.js';
+import { TALENT_TREES, talentBonuses, talentPointsAvailable, spendTalent } from './talents.js';
+import { BALANCE } from './balance.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -896,6 +898,48 @@ $('chat-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') sendChat();
 });
 
+// --- Talents ---
+function renderTalents() {
+  const points = talentPointsAvailable(hero);
+  $('talent-points').textContent = points;
+  const tree = TALENT_TREES[hero.classId] || [];
+  const spent = hero.talents || {};
+  const el = $('talent-list');
+  el.innerHTML = '';
+  for (const t of tree) {
+    const rank = spent[t.id] || 0;
+    const div = document.createElement('div');
+    div.className = 'panel';
+    div.style.margin = '8px 0';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b>${t.emoji} ${t.name}</b> <span class="muted">(${rank}/${t.maxRank})</span><br>
+          <small class="muted">${t.desc}</small>
+        </div>
+        <button class="btn small gold" data-talent="${t.id}" ${rank >= t.maxRank || points <= 0 ? 'disabled' : ''}>+</button>
+      </div>
+    `;
+    el.appendChild(div);
+  }
+  // Wire up buttons
+  el.querySelectorAll('[data-talent]').forEach(btn => {
+    btn.onclick = () => {
+      const r = spendTalent(hero, btn.dataset.talent);
+      if (r.ok) {
+        saveHero();
+        renderTalents();
+        updateHUD();
+        toast('Talent point spent!');
+      } else if (r.reason === 'points') {
+        toast('No talent points available');
+      } else if (r.reason === 'max') {
+        toast('Max rank reached');
+      }
+    };
+  });
+}
+
 // --- Bottom Tab Navigation ---
 let currentTab = 'battle';
 
@@ -913,6 +957,7 @@ function showTab(tabId) {
   if (tabId === 'quests') renderQuests();
   if (tabId === 'auction') renderAuction();
   if (tabId === 'mail') renderMail();
+  if (tabId === 'talents') renderTalents();
   if (tabId === 'gm') { loadGMFeedback(); updateGMStatus(); }
   if (tabId === 'chat') {
     loadChat();
