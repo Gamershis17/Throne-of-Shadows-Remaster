@@ -896,6 +896,39 @@ $('chat-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') sendChat();
 });
 
+// --- Bottom Tab Navigation ---
+let currentTab = 'battle';
+
+function showTab(tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+  const tab = $('tab-' + tabId);
+  if (tab) tab.classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if (btn) btn.classList.add('active');
+  currentTab = tabId;
+  battlePaused = tabId !== 'battle';
+  if (tabId === 'party') renderParty();
+  if (tabId === 'dungeon') renderDungeons();
+  if (tabId === 'quests') renderQuests();
+  if (tabId === 'auction') renderAuction();
+  if (tabId === 'mail') renderMail();
+  if (tabId === 'gm') { loadGMFeedback(); updateGMStatus(); }
+  if (tabId === 'chat') {
+    loadChat();
+    clearInterval(chatTimer);
+    chatTimer = setInterval(loadChat, 3000);
+  } else {
+    clearInterval(chatTimer);
+  }
+  if (tabId !== 'battle') updateHUD();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => showTab(btn.dataset.tab);
+});
+
+// --- GM Panel Functions ---
 // --- GM ---
 let isGMUser = false;
 let lastAnnounceSeen = 0;
@@ -1168,87 +1201,4 @@ $('feedback-btn') && ($('feedback-btn').onclick = async () => {
   $('feedback-input').value = '';
   toast('📝 Feedback sent! Thanks.');
 });
-
-// --- Menu Navigation ---
-const MENU_ITEMS = [
-  { id: 'battle', emoji: '⚔️', name: 'Battle' },
-  { id: 'party', emoji: '👥', name: 'Party' },
-  { id: 'dungeon', emoji: '🗺️', name: 'Dungeon' },
-  { id: 'character', emoji: '👤', name: 'Hero' },
-  { id: 'gear', emoji: '🎒', name: 'Gear' },
-  { id: 'quests', emoji: '📜', name: 'Quests' },
-  { id: 'auction', emoji: '🏪', name: 'Auction' },
-  { id: 'mail', emoji: '📬', name: 'Mail' },
-  { id: 'chat', emoji: '💬', name: 'Chat' },
-  { id: 'settings', emoji: '⚙️', name: 'Settings' },
-];
-
-function renderMenu() {
-  const el = $('menu-items');
-  el.innerHTML = '';
-  for (const item of MENU_ITEMS) {
-    // Skip GM (separate button)
-    const btn = document.createElement('button');
-    btn.className = 'menu-item' + (currentTab === item.id ? ' active' : '');
-    btn.innerHTML = `<span class="mi-emoji">${item.emoji}</span> ${item.name}`;
-    btn.onclick = () => switchTab(item.id);
-    el.appendChild(btn);
-  }
-  // GM button (if GM)
-  if (isGMUser) {
-    const btn = document.createElement('button');
-    btn.className = 'menu-item' + (currentTab === 'gm' ? ' active' : '');
-    btn.innerHTML = `<span class="mi-emoji">👑</span> GM Panel`;
-    btn.onclick = () => switchTab('gm');
-    el.appendChild(btn);
-  }
-}
-
-let currentTab = 'battle';
-
-function switchTab(tabId) {
-  // Hide all tabs
-  document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
-  // Show selected
-  const tab = $('tab-' + tabId);
-  if (tab) tab.classList.remove('hidden');
-  currentTab = tabId;
-  // Pause battle when not on battle
-  battlePaused = tabId !== 'battle';
-  // Render tab content
-  if (tabId === 'party') renderParty();
-  if (tabId === 'dungeon') renderDungeons();
-  if (tabId === 'quests') renderQuests();
-  if (tabId === 'auction') renderAuction();
-  if (tabId === 'mail') renderMail();
-  if (tabId === 'gm') { loadGMFeedback(); updateGMStatus(); }
-  if (tabId === 'chat') {
-    loadChat();
-    clearInterval(chatTimer);
-    chatTimer = setInterval(loadChat, 3000);
-  } else {
-    clearInterval(chatTimer);
-  }
-  if (tabId !== 'battle') updateHUD();
-  // Close menu
-  $('side-menu').classList.add('hidden');
-  $('menu-overlay').classList.add('hidden');
-  renderMenu();
-}
-
-$('menu-btn').onclick = () => {
-  renderMenu();
-  $('side-menu').classList.remove('hidden');
-  $('menu-overlay').classList.remove('hidden');
-};
-
-$('menu-close').onclick = () => {
-  $('side-menu').classList.add('hidden');
-  $('menu-overlay').classList.add('hidden');
-};
-
-$('menu-overlay').onclick = () => {
-  $('side-menu').classList.add('hidden');
-  $('menu-overlay').classList.add('hidden');
-};
 
